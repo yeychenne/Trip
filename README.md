@@ -1,5 +1,6 @@
 #Trip planning app
 Innovation project @ECP 
+
 —————————————————
 ###Requisites:
 1. Node     [download] (https://nodejs.org/download/)
