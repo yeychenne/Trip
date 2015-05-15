@@ -1,0 +1,38 @@
+//- login.jade
+doctype html
+html(lang='en')
+    head
+        title  Authentication
+        //- load bootstrap css
+        link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css") 
+        //- Load fonts
+        link(rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css") 
+
+    body(style='padding-top:80px;')
+        div.container
+            div.col-sm-6.col-sm-offset-3
+                h1
+                    span.fa.fa-sign-in  Login
+                //- show any messages that come back with authentication 
+
+                if (message.length > 0) 
+                    div.alert.alert-danger  message 
+      
+                 //- LOGIN FORM 
+                form(action="/login" method="post")
+                    div.form-group
+                        label(Email)
+                        input(type="text" class="form-control" name="email")
+            
+                    div.form-group
+                        label(Password)
+                        input(type="password" class="form-control" name="password")
+            
+
+                    button(type="submit" class="btn btn-warning btn-lg") Login
+                hr
+
+                p Need an account?
+                    a(href="/signup") Signup
+                p Or go 
+                    a(href="/") home

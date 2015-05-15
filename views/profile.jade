@@ -1,0 +1,104 @@
+//- Signup.jade
+doctype html
+html(lang='en')
+    head
+        title  My Profile
+        //- load bootstrap css
+        link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css") 
+        //- Load fonts
+        link(rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css") 
+
+        body(style='padding-top:80px;')
+            div.container
+                div.page-header.text-center
+                    h1
+                        span.fa.fa-anchor  Profile Page
+                    a.btn.btn-default.btn-sm(href="/logout") Logout
+   
+                div.row
+                    //- Local info
+                    div.col-sm-6
+                        div.well
+                            h3
+                                span.fa.fa-user  Local
+
+                            if (user.local.email)
+                                p
+                                    strong id:
+                                    =user._id
+                                    <br>
+                                    strong email:
+                                    =user.local.email
+                                    <br>
+                                    strong password: 
+                                    =user.local.password
+                                a.btn.btn-defaul(href="/unlink/local") Unlink
+
+                            else
+                                a.btn.btn-defaul(href="/connect/local") Connect Local
+
+                    
+                    //-Facebok info
+                    div.col-sm-6
+                        div.well
+                            h3.text-primary
+                                span.fa.fa-facebook  Facebook
+
+                            if (user.facebook.token)
+                                p
+                                    strong id:
+                                    =user.facebook.id
+                                    <br>
+                                    strong email:
+                                    =user.facebook.email
+                                    <br>
+                                    strong Name: 
+                                    =user.facebook.name
+                                a.btn.btn-primary(href="/unlink/facebook") Unlink
+                            else
+                                a.btn.btn-primary(href="/connect/facebook") Connect Facebook
+
+                    //-Twitter info
+                    div.col-sm-6
+                        div.well
+                            h3.text-primary
+                                span.fa.fa-twitter  Twitter
+
+                            if (user.twitter.token)
+                                p
+                                    strong id:
+                                    =user.twitter.id
+                                    <br>
+                                    strong username:
+                                    =user.twitter.username
+                                    <br>
+                                    strong Name: 
+                                    =user.twitter.displayName
+                                a.btn.btn-info(href="/unlink/twitter") Unlink
+                            else
+                                a.btn.btn-info(href="/connect/twitter") Connect Twitter
+
+
+                    //-Google info
+                    div.col-sm-6
+                        div.well
+                            h3.text-primary
+                                span.fa.fa-google-plus  Google
+
+                            if (user.google.token)
+                                p
+                                    strong id:
+                                    =user.google.id
+                                    <br>
+                                    strong email:
+                                    =user.google.email
+                                    <br>
+                                    strong Name: 
+                                    =user.google.name
+                                a.btn.btn-danger(href="/unlink/google") Unlink
+                            else
+                                a.btn.btn-danger(href="/connect/google") Connect Google
+
+                        
+
+           

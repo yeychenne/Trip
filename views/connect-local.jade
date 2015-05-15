@@ -1,0 +1,35 @@
+
+//- connect-local.jade
+doctype html
+html(lang='en')
+    head
+        title  My account
+        //- load bootstrap css
+        link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css") 
+        //- Load fonts
+        link(rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css") 
+
+        body(style='padding-top:80px;')
+            div.container
+                div.col-sm-6.col-sm-offset-3
+                    h1
+                        span.fa.fa-user  Add Local Account
+
+                    if (message.length > 0)
+                        div.alert.alert-danger message 
+                    //- Form
+                    form(action="/connect/local" method="post")
+                        div.form-group
+                            label(Email)
+                            input(type="text" class="form-control" name="email")
+        
+                        div.form-group
+                            label(Password)
+                            input(type="password" class="form-control" name="password")
+
+                        button(type="submit" class="btn btn-warning btn-lg") Add Local
+
+                    <hr>
+
+                    p
+                        a(href="/profile") Go back to profile
