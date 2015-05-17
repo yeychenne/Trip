@@ -9,6 +9,7 @@ module.exports = function(app) {
 // New trip ============================================
     app.get('/newtrip', function(req, res) {
         Site.find({}).lean().exec(function (err, sites) {
+            if(err) console.log("Cannot read database");
             res.render('newtrip', {sites: sites});
         });
     });
