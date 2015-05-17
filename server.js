@@ -30,7 +30,8 @@ var express = require('express')
   , cookieParser = require('cookie-parser')
   , morgan       = require('morgan')
   , session      = require('express-session')
-  , bodyParser   = require('body-parser');
+  , bodyParser   = require('body-parser')
+  , favicon = require('serve-favicon');
 
 //Config mongoDB ======================================================================
 var configDB = require('./config/database.js');
@@ -69,14 +70,24 @@ app.use(session({ secret: 'ibminnoproject2016'})); // session secret
 app.use(passport.initialize());
 app.use(passport.session()); // persistent login sessions
 app.use(flash()); // use connect-flash for flash messages stored in session
-
+app.use(favicon(__dirname + '/public/img/favicon.ico'));
 
 
 // routes ======================================================================
+// User relative --------------------------------------------------------------
 require('./app/user_routes.js')(app, passport); // load our routes and pass in our app and fully configured passport
 
-// Port ========================================================================
+// Trip relative --------------------------------------------------------------
+require('./app/trip_routes.js')(app);
 
+// catch 404 and forward to error handler
+app.use(function (req, res, next) {
+    var err = new Error('Not Found');
+    err.status = 404;
+    next(err);
+});
+
+// Port ========================================================================
 var port = process.env.VCAP_APP_PORT || 3000;
 app.listen(port);
 console.log('listening at:', port);

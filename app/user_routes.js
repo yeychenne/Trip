@@ -41,7 +41,7 @@ module.exports = function(app, passport) {
         // SIGNUP =================================
         // show the signup form
         app.get('/signup', function(req, res) {
-            res.render('signup', { message: req.flash('loginMessage') });
+            res.render('signup', { message: req.flash('signupMessage') });
         });
 
         // process the signup form
@@ -96,6 +96,7 @@ module.exports = function(app, passport) {
         app.get('/connect/local', function(req, res) {
             res.render('connect-local', { message: req.flash('loginMessage') });
         });
+
         app.post('/connect/local', passport.authenticate('local-signup', {
             successRedirect : '/profile', // redirect to the secure profile section
             failureRedirect : '/connect/local', // redirect back to the signup page if there is an error
@@ -183,13 +184,11 @@ module.exports = function(app, passport) {
         });
     });
 
+    // route middleware to ensure user is logged in
+    function isLoggedIn(req, res, next) {
+        if (req.isAuthenticated())
+            return next();
+        res.redirect('/');
+    };
 
-};
-
-// route middleware to ensure user is logged in
-function isLoggedIn(req, res, next) {
-    if (req.isAuthenticated())
-        return next();
-
-    res.redirect('/');
 }

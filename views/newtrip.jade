@@ -1,0 +1,94 @@
+//- newtrip.jade
+doctype html
+html(lang='en')
+    head
+        title  My trip
+        //- load bootstrap css
+        link(rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css")
+        //- Load fonts
+        link(rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css")
+        //-load datepicker css
+        link(rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.0/css/bootstrap-datepicker.css")
+        //- JQuery
+        script(src="https://code.jquery.com/jquery-2.0.2.min.js")
+        //- mapbox
+        script(src='https://api.tiles.mapbox.com/mapbox.js/v2.1.9/mapbox.js')
+        link(href='https://api.tiles.mapbox.com/mapbox.js/v2.1.9/mapbox.css' rel='stylesheet')
+        link(rel="stylesheet" href="/stylesheets/mapstyle.css" )
+
+
+    body
+        //- Nav bar
+        div.navbar.navbar-default
+            div.navbar-header
+                a.navbar-brand(href="/profile")
+                    i.fa.fa-user  Profile
+        div.container-fluid
+            div.row
+                div.col-lg-8.col-md-7.col-sm-6
+                    h1 Awesome
+                    p.lead Let's pick some
+                    div.progress
+                        div.progress-bar.progress-bar-success(role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 40%")
+        div.container-fluid
+            div.row.h600
+                div.sidebar
+                    div.heading.pad2
+                        h1.center Paris museums
+                    div.listings(id="listings")
+                div.map(id="map")
+        script.
+            var geojson=!{JSON.stringify(sites)};
+            var extended_json=[{"type": "FeatureCollection","features":geojson}];
+            L.mapbox.accessToken = 'pk.eyJ1IjoicmVkZ25zIiwiYSI6InM2Mk9PdVEifQ.owDLmACFrdOh5Ch_7maj9w';
+            var map = L.mapbox.map('map', 'examples.map-i80bb8p3')
+            .setView([48.858093, 2.294694], 13)
+            map.scrollWheelZoom.disable();
+            var listings = document.getElementById('listings');
+            var locations = L.mapbox.featureLayer().addTo(map);
+            locations.setGeoJSON(extended_json);
+            function setActive(el) {
+            var siblings = listings.getElementsByTagName('div');for (var i = 0; i < siblings.length; i++) {
+            siblings[i].className = siblings[i].className
+            .replace(/active/, '').replace(/\s\s*$/, '');
+            }
+            el.className += ' active';
+            }
+            locations.eachLayer(function(locale) {
+                //- Shorten locale.feature.properties to just `prop` so we're not
+                //- writing this long form over and over again.
+                var prop = locale.feature.properties;
+                var popup = '<h3>'+prop.title+'</h3><div>'+ prop.adresse +'<br>'+prop.ville;
+                var listing = listings.appendChild(document.createElement('div'));
+                listing.className = 'item';
+                var link = listing.appendChild(document.createElement('a'));
+                link.href = '#';
+                link.className = 'title';
+                link.innerHTML = prop.title;
+                var details = listing.appendChild(document.createElement('div'));
+                details.innerHTML = prop.ville;
+                link.onclick = function() {
+                setActive(listing);
+                //- When a menu item is clicked, animate the map to center
+                //- its associated locale and open its popup.
+                map.setView(locale.getLatLng(), 16);
+                locale.openPopup();
+                return false;
+                };
+                locale.on('click', function(e) {
+                //-1. center the map on the selected marker.
+                map.panTo(locale.getLatLng());
+                //- 2. Set active the markers associated listing.
+                setActive(listing);
+                });
+                popup += '</div>';
+                locale.bindPopup(popup);
+                locale.setIcon(L.icon({
+                    iconUrl: '/img/marker.png',
+                    iconSize: [56, 56],
+                    iconAnchor: [28, 28],
+                    popupAnchor: [0, -34]
+                    }));
+                });
+
+

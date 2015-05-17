@@ -16,7 +16,7 @@ html(lang='en')
                         span.fa.fa-user  Add Local Account
 
                     if (message.length > 0)
-                        div.alert.alert-danger message 
+                        div.alert.alert-danger #{message}  
                     //- Form
                     form(action="/connect/local" method="post")
                         div.form-group

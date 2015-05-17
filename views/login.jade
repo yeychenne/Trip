@@ -16,7 +16,7 @@ html(lang='en')
                 //- show any messages that come back with authentication 
 
                 if (message.length > 0) 
-                    div.alert.alert-danger  message 
+                    div.alert.alert-danger #{message} 
       
                  //- LOGIN FORM 
                 form(action="/login" method="post")
@@ -29,7 +29,7 @@ html(lang='en')
                         input(type="password" class="form-control" name="password")
             
 
-                    button(type="submit" class="btn btn-warning btn-lg") Login
+                    button(type="submit" class="btn btn-warning") Login
                 hr
 
                 p Need an account?

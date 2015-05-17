@@ -12,7 +12,7 @@ Innovation project @ECP
 ###To start app locally:
 
 1. npm install
-2. npm start 
+2. npm start  ( require nodemon, alt: run with $node server.js)
 3. Listen to port 3000
 
 ###Config: 
