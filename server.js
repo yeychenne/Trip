@@ -60,9 +60,8 @@ function compile(str, path) {
   app.use(stylus.middleware({ src: __dirname + '/public', compile: compile}));
 
   // Add error handling in dev
-  if (!process.env.VCAP_SERVICES) {
-    app.use(errorhandler());
-  }
+ 
+  app.use(errorhandler());
 
 //Passport settings ====================================================================
 require('./config/passport')(passport); // pass passport for configuration
@@ -81,11 +80,33 @@ require('./app/user_routes.js')(app, passport); // load our routes and pass in o
 require('./app/trip_routes.js')(app);
 
 // catch 404 and forward to error handler
-app.use(function (req, res, next) {
-    var err = new Error('Not Found');
-    err.status = 404;
-    next(err);
+app.get('/404', function(req, res, next){
+  // trigger a 404 since no other middleware
+  // will match /404 after this one, and we're not
+  // responding here
+  next();
 });
+
+app.use(function(req, res, next){
+  res.status(404);
+
+  // respond with html page
+  if (req.accepts('html')) {
+    res.render('404', { url: req.url });
+    return;
+  }
+
+  // respond with json
+  if (req.accepts('json')) {
+    res.send({ error: 'Not found' });
+    return;
+  }
+
+  // default to plain-text. send()
+  res.type('txt').send('Not found');
+});
+
+
 
 // Port ========================================================================
 var port = process.env.VCAP_APP_PORT || 3000;

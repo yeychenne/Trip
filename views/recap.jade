@@ -1,0 +1,38 @@
+//- newtrip.jade
+doctype html
+html(lang='en')
+    head
+        title  My trip
+        //- load bootstrap css
+        link(rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css")
+        //- Load fonts
+        link(rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css")
+        //-load datepicker css
+        link(rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.0/css/bootstrap-datepicker.css")
+        //- JQuery
+        script(src="https://code.jquery.com/jquery-2.0.2.min.js")
+        link(rel="stylesheet" href="/stylesheets/mapstyle.css" )
+    body
+        //- Nav bar
+        div.navbar.navbar-default
+            div.navbar-header
+                a.navbar-brand(href="/profile")
+                    i.fa.fa-user  Profile
+        div.container-fluid
+            div.jumbotron
+                h1 Your trip ~ #{trip.name}
+                h2 From #{trip.start_date} to #{trip.end_date}
+                div.container-fuild
+                    h3 You've selected #{trip.sites.length} sites:
+                    div.container-fuild(id="sites",style="max-height:200px;")
+                div.col-md-4.col-md-offset-4
+                    a(type="submit" class="btn btn-success btn-lg" href='/optimize/:'+trip.id) Let the magic begin
+
+        script.
+            var selected= document.getElementById('sites');
+            var jsonsites=!{JSON.stringify(sites)};
+            for(var i=0; i<jsonsites.length; i++){
+                var el=selected.appendChild(document.createElement('div'));
+                el.innerHTML=jsonsites[i].properties.title;
+                el.className="btn btn-default btn-custom"
+            }

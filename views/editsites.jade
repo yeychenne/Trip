@@ -29,14 +29,22 @@ html(lang='en')
             div.jumbotron
                 div.row
                     div.col-md-4
-                        h1 Awesome
+                        h1 Awesome 
                         p.lead Let's pick some sites
                         div.progress(id="progress-selection")
                             div.progress-bar.progress-bar-success.progress-bar-striped(role="progressbar" aria-valuenow=20 aria-valuemin="0" aria-valuemax="100" style="width: 20%")
-                    div.col-md-8
-                        h2
-                            i.icon-th-list Selection from Paris
-                        div.well(id="selectionThumbs")
+                    div.col-md-8.pad2(style="border-style:dotted;height:90%;border-color:#A0A0A0;border-width: 1px;")
+                        div.row(style="padding:10px;")
+                            div(style="margin-left: 47%;")
+                                div.numberCircle(id="sitescount") 0
+                        form(action="/savesites" method="post")
+                            div.container-fluid(id="selectionThumbs",style="height:120px; overflow:auto;")
+                                input(type='hidden' name='tosend' value=[] id="tosend")
+                                input(type='hidden' name='meta' value="" id="meta")
+                            div(style="margin-left: 44%;")
+                                button.btn.btn-success(type='submit' id='submit') Save list
+
+
 
 
         div.container-fluid
@@ -48,8 +56,7 @@ html(lang='en')
                 div.map(id="map")
                 input(id='search' class='search-ui' placeholder='Enter name')
         script.
-            var selection=[];
-            var geojson=!{JSON.stringify(sites)};
+            var geojson=!{JSON.stringify(dbsites)};
             var extended_json=[{"type": "FeatureCollection","features":geojson}];
             L.mapbox.accessToken = 'pk.eyJ1IjoicmVkZ25zIiwiYSI6InM2Mk9PdVEifQ.owDLmACFrdOh5Ch_7maj9w';
             var map = L.mapbox.map('map', 'examples.map-i80bb8p3')
@@ -57,6 +64,12 @@ html(lang='en')
             map.scrollWheelZoom.disable();
             var listings = document.getElementById('listings');
             var thumbs = document.getElementById('selectionThumbs');
+            var cnt = document.getElementById('sitescount');
+            var tosend = document.getElementById('tosend');
+            var meta = document.getElementById('meta');
+            var trip=!{JSON.stringify(trip)};
+            meta.value=trip._id;
+            var selected= [];
             var locations = L.mapbox.featureLayer().addTo(map);
             locations.setGeoJSON(extended_json);
             function setActive(el) {
@@ -98,18 +111,39 @@ html(lang='en')
                 if(select.value%2==1){
                 select.className="btn btn-success";
                 select.innerHTML="Selected";
-                var t=thumbs.appendChild(document.createElement('a'));
+                var t=thumbs.appendChild(document.createElement('div'));
                 t.innerHTML=prop.title;
-                t.className="btn btn-default btn-custom"
+                t.className="btn btn-default btn-custom";
                 t.id=prop.title;
                 t.disabled=true;
+                var b=t.appendChild(document.createElement('button'));
+                b.className="btn btn-link stickit black";
+                var icon=b.appendChild(document.createElement('span'));
+                b.onclick=function(){
+                    select.click();
+                    }
+                icon.className="glyphicon glyphicon-remove black";
+                var tmp=parseInt(cnt.innerHTML)+1;
+                cnt.innerHTML=tmp.toString();
+                selected.push(locale.feature._id);
+                tosend.value=JSON.stringify(selected);
                 } else {
                 select.className="btn btn-default";
                 select.innerHTML="Add to trip";
                 var r=document.getElementById(prop.title);
                 thumbs.removeChild(r);
+                var tmp=parseInt(cnt.innerHTML)-1;
+                cnt.innerHTML=tmp.toString();
+                var index = selected.indexOf(locale.feature._id);
+                if (index > -1) selected.splice(index, 1);
+                tosend.value=JSON.stringify(selected);
                 }
-                };
+                var sub = document.getElementById('submit');
+                if(tmp==0) {
+                sub.disabled=true;
+                }else
+                sub.disabled=false;
+                }
                 locale.on('click', function(e) {
                 //-1. center the map on the selected marker.
                 map.panTo(locale.getLatLng());
