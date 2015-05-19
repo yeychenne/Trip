@@ -1,4 +1,4 @@
-//- newtrip.jade
+//- recap.jade
 doctype html
 html(lang='en')
     head
@@ -22,6 +22,7 @@ html(lang='en')
             div.jumbotron
                 h1 Your trip ~ #{trip.name}
                 h2 From #{trip.start_date} to #{trip.end_date}
+                h3 Staying at " #{trip.stayaddress.name}"
                 div.container-fuild
                     h3 You've selected #{trip.sites.length} sites:
                     div.container-fuild(id="sites",style="max-height:200px;")

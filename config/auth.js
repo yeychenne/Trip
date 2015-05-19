@@ -16,9 +16,10 @@ module.exports = {
     },
 
     'googleAuth' : {
-        'clientID'      : '74619892946-tue4gurae486hcp717fmebk6ri15u5hb.apps.googleusercontent.com',
-        'clientSecret'  : 'QQyACE0RDvr9rMkyT2fMEeMJ',
-        'callbackURL'   : 'http://127.0.0.1:3000/auth/google/callback'
+        'clientID'      : '74619892946-vtnffp4e5b9ad3opnd8pre4qp2440lis.apps.googleusercontent.com',
+        'clientSecret'  : 'Ab9BQ0js7NIHaMgI4BKVOXB0',
+        'callbackURL'   : 'http://127.0.0.1:3000/auth/google/callback',
+        'APIkey'        : 'AIzaSyAjBCEJh0Kmvnj14GQ1G0aJ_080T8HkuVA'
     }
 
 };

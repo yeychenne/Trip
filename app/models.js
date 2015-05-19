@@ -65,6 +65,7 @@ var TripSchema = new mongoose.Schema({
     start_date : String,
     end_date : String,
     sites: [{type :mongoose.Schema.ObjectId, ref: 'SiteSchema'},],
+    stayaddress   : {name: String, coordinates :Array},
     feedback  : String,
     updated_at : Date
 });

@@ -1,4 +1,4 @@
-//- Signup.jade
+//- profile.jade
 doctype html
 html(lang='en')
     head
@@ -13,7 +13,9 @@ html(lang='en')
         script(src="https://code.jquery.com/jquery-2.0.2.min.js")
         //-Load Datepicker
         script(src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.0/js/bootstrap-datepicker.js")
-        //- Angular controller
+        //- Google Address autocomplete
+        script(src="https://maps.googleapis.com/maps/api/js?libraries=places")
+
         style.
             .redbkg {background-color: #5bc0de;}
 
@@ -31,9 +33,9 @@ html(lang='en')
                     a.btn.btn-default.navbar-btn(href="/logout") Logout
 
         //- Add trip
-        div.container
+        div.jumbotron
             div.page-header.text-center
-                h1 Let's start a trip
+                h2 Let's start a trip
                 div.alert.alert-info
                     form(action="/newtrip" method="post")
                         h3 Step 1: Pick a date
@@ -51,12 +53,42 @@ html(lang='en')
                             span.input-group-addon
                                 i.fa.fa-suitcase
                             input(type="text" class="input-sm form-control" placeholder="My fabulous trip to Paris" name="name")
+                        h3 Step 3: Your address in Paris
+                        input(id="stayat" type="text" size="50" placeholder="My address")
+                        input(id="textaddress" type="hidden" name="textaddress" value="")
+                        input(id="lat" type="hidden"  name="lat", value="")
+                        input(id="lng" type="hidden"  name="lng", value="")
+                        br
+                        br
                         button(type="submit" class="btn btn-info") Submit
                     
                     script.
                         $('#tripdates .input-daterange').datepicker({format: "dd-mm-yy", startDate: "today",todayHighlight: true});
+                    script.
+                        var defaultBounds = new google.maps.LatLngBounds(
+                            new google.maps.LatLng(1.4153305918,48.3691421584),
+                            new google.maps.LatLng(3.4312245109,49.2345906975));
+                        var input = document.getElementById('stayat');
+                        var options = {
+                        bounds: defaultBounds,
+                        types: ['address'],
+                        componentRestrictions: {country: 'fr'}
+                        };
+                        autocomplete = new google.maps.places.Autocomplete(input, options);
+                        google.maps.event.addListener(autocomplete, 'place_changed', function() {
+                            fillInAddress();
+                            });
+                        function fillInAddress() {
+                        // Get the place details from the autocomplete object.
+                        var address = autocomplete.getPlace().formatted_address;
+                        var loc=autocomplete.getPlace().geometry.location;
+                        // Get each component of the address from the place details
+                        document.getElementById("textaddress").value = address;
+                        document.getElementById("lat").value = loc.lat();
+                        document.getElementById("lng").value = loc.lng();
+                        }
 
-                       
+
 
         //- Account info    
 
@@ -68,21 +100,15 @@ html(lang='en')
 
             div.row
                 //- Local info
-                div.col-sm-6
+                div.col-sm-4
                     div.well
                         h3
                             span.fa.fa-user  Local
 
                         if (user.local.email)
                             p
-                                strong id:
-                                =user._id
-                                br
-                                strong email:
+                                strong Username: 
                                 =user.local.email
-                                <br>
-                                strong password: 
-                                =user.local.password
                             a.btn.btn-defaul(href="/unlink/local") Unlink
 
                         else
@@ -90,17 +116,14 @@ html(lang='en')
 
                 
                 //-Facebok info
-                div.col-sm-6
+                div.col-sm-4
                     div.well
                         h3.text-primary
                             span.fa.fa-facebook  Facebook
 
                         if (user.facebook.token)
                             p
-                                strong id:
-                                =user.facebook.id
-                                <br>
-                                strong email:
+                                strong email: 
                                 =user.facebook.email
                                 <br>
                                 strong Name: 
@@ -110,17 +133,14 @@ html(lang='en')
                             a.btn.btn-primary(href="/connect/facebook") Connect Facebook
 
                 //-Twitter info
-                div.col-sm-6
+                div.col-sm-4
                     div.well
                         h3.text-primary
                             span.fa.fa-twitter  Twitter
 
                         if (user.twitter.token)
                             p
-                                strong id:
-                                =user.twitter.id
-                                <br>
-                                strong username:
+                                strong username: 
                                 =user.twitter.username
                                 <br>
                                 strong Name: 
@@ -131,17 +151,14 @@ html(lang='en')
 
 
                 //-Google info
-                div.col-sm-6
+                div.col-sm-4
                     div.well
                         h3.text-primary
                             span.fa.fa-google-plus  Google
 
                         if (user.google.token)
                             p
-                                strong id:
-                                =user.google.id
-                                <br>
-                                strong email:
+                                strong email: 
                                 =user.google.email
                                 <br>
                                 strong Name: 

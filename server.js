@@ -40,7 +40,6 @@ mongoose.connect(configDB.url);
 
 // Configure Express ==================================================================
   app.use(bodyParser());
-    app.use(bodyParser.urlencoded({ extended: true }));
   app.use(cookieParser());
   app.use(morgan('dev'));
 
@@ -78,6 +77,7 @@ require('./app/user_routes.js')(app, passport); // load our routes and pass in o
 
 // Trip relative --------------------------------------------------------------
 require('./app/trip_routes.js')(app);
+require('./app/optimize.js')(app);
 
 // catch 404 and forward to error handler
 app.get('/404', function(req, res, next){

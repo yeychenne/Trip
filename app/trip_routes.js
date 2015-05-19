@@ -1,8 +1,10 @@
 // File system module
 var fs = require('fs');
+var gm = require('googlemaps');
 // load up the trip model
-var Trip   = require('../app/models').Trip;
-var Site   = require('../app/models').Site;
+var Trip   = require('./models').Trip;
+var Site   = require('./models').Site;
+var configAuth = require('../config/auth');
 
 module.exports = function(app) {
 
@@ -46,25 +48,6 @@ module.exports = function(app) {
                 console.log("Something went wrong");
         }});
     });
-// Trip Recap =============================================
-    app.get('/optimize/:id', function (req, res) {
-        var id = req.params.id;
-        while(id.charAt(0) === ':')
-            id = id.substr(1);
-        Trip.findById(id, function(err, trip){
-            if (err) {
-                console.log("Wrong trip id");
-            } else {
-                if (trip) {
-                console.log(trip);
-                Site.find({'_id': { $in:trip.sites}}).lean().exec(function(err, sites){
-                    console.log(sites);
-                    res.render('recap', {sites: sites, trip: trip});
-                });
-                } else
-                console.log("Something went wrong");
-        }});
-    });
 
 // API Export the sites database ==============================
     app.get("/api/sites", function (req, res) {
@@ -78,7 +61,10 @@ module.exports = function(app) {
 
 // process the new trip form ===========================
     app.post('/newtrip',function(req, res) {
-        console.log(req.body.start_date);
+        console.log(JSON.stringify(req.body));
+        var coordinates=new Array();
+        coordinates.push(req.body.lat);
+        coordinates.push(req.body.lng);
         var newtrip = new Trip({
             name : req.body.name,
             user: req.user,
@@ -87,6 +73,7 @@ module.exports = function(app) {
             sites: [],
             feedback  : "",
             updated_at : Date.now(),
+            stayaddress    : { "name" :req.body.textaddress, "coordinates":coordinates }
         });
         newtrip.save(function (err) {
             if (err) return handleError(err);
