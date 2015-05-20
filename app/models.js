@@ -55,7 +55,8 @@ var SiteSchema = new mongoose.Schema({
     geometry : {
         type   : String,
         coordinates : Array
-    }
+    },
+    visit   :   Number
 });
 
 // define the schema for Trip model
