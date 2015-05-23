@@ -1,4 +1,4 @@
-/**
+ /**
  * Copyright 2014 IBM Corp. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-'use strict';
 
 var express = require('express')
+  , cfenv = require('cfenv')
   , app = express()
-  , bluemix = require('./config/bluemix')
-  , watson = require('watson-developer-cloud')
   , extend = require('util')._extend
   , stylus = require('stylus')
   , nib = require('nib')
@@ -33,10 +31,15 @@ var express = require('express')
   , bodyParser   = require('body-parser')
   , favicon = require('serve-favicon');
 
+
+//Config ENV  ======================================================================
+var appEnv = cfenv.getAppEnv();
 //Config mongoDB ======================================================================
 var configDB = require('./config/database.js');
-mongoose.connect(configDB.url);
-
+if(appEnv.isLocal)
+mongoose.connect(configDB.local);
+else
+mongoose.connect(configDB.bluemix);
 
 // Configure Express ==================================================================
   app.use(bodyParser());
@@ -77,7 +80,7 @@ require('./app/user_routes.js')(app, passport); // load our routes and pass in o
 
 // Trip relative --------------------------------------------------------------
 require('./app/trip_routes.js')(app);
-require('./app/optimize.js')(app);
+require('./app/optimize.js')(app,appEnv);
 
 // catch 404 and forward to error handler
 app.get('/404', function(req, res, next){
@@ -109,6 +112,7 @@ app.use(function(req, res, next){
 
 
 // Port ========================================================================
-var port = process.env.VCAP_APP_PORT || 3000;
-app.listen(port);
-console.log('listening at:', port);
+// start server on the specified port and binding host
+app.listen(appEnv.port, appEnv.bind, function() {
+  console.log("server starting on " + appEnv.url);
+});

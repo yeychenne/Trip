@@ -1,6 +1,6 @@
 //- optimize.jade
 doctype html
-html(lang='en')
+html
     head
         title  Optimized Trip
         //- load bootstrap css
@@ -15,7 +15,106 @@ html(lang='en')
         script(src='https://api.tiles.mapbox.com/mapbox.js/v2.1.9/mapbox.js')
         link(href='https://api.tiles.mapbox.com/mapbox.js/v2.1.9/mapbox.css' rel='stylesheet')
         link(rel="stylesheet" href="/stylesheets/mapstyle.css" )
-        //- Leaflet
-        script(src='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.2.0/leaflet-omnivore.min.js')
+        link(rel="stylesheet" href="/stylesheets/timeline.css" )
+
+
     body
-        h1 To do
+        //- Nav bar
+        div.navbar.navbar-default
+            div.navbar-header
+                a.navbar-brand(href="/profile")
+                    i.fa.fa-user  Profile
+        div.container
+            div.jumbotron
+                    h1 Your trip ~ #{data.trip.name}
+                    h2 From #{data.trip.start_date} to #{data.trip.end_date}
+                    p Staying at " #{data.trip.stayaddress.name}"
+            div.container-fuild
+                div.container.pad2(id="planning")
+
+        script.
+            var planning= document.getElementById('planning');
+            var data=!{JSON.stringify(data)};
+            var combi=!{JSON.stringify(combi)};
+            var cm=combi.bestcomb.prop
+            var trip=data.trip;
+            var sites=data.sites;
+            var D=data.matrix;
+            for(var i=0;i<data.days;i++){
+                var vtime=0;
+                var titleDay=planning.appendChild(document.createElement('H3'));
+                titleDay.innerHTML="Day "+(i+1);
+                var summary=planning.appendChild(document.createElement('div'));
+                summary.className="bs-callout bs-callout-info";
+                var day=planning.appendChild(document.createElement('ul'));
+                day.className="timeline";
+                var list=day.appendChild(document.createElement('li'));
+                var badge=list.appendChild(document.createElement('div'));
+                badge.className="timeline-badge";
+                var icon=badge.appendChild(document.createElement('i'));
+                list.style.marginBottom ="90px";
+                icon.className="glyphicon glyphicon-home";
+                
+                
+                for(var j=1;j<cm[i].length-1;j++){
+                    var list=day.appendChild(document.createElement('li'));
+                    list.style.marginBottom ="90px";
+                    list.style.marginTop ="90px";
+                    var route=list.appendChild(document.createElement('div'));
+                    route.className="fancyroute";
+                    var icon=route.appendChild(document.createElement('i')).className="fa fa-car";
+                    route.appendChild(document.createElement("BR"));
+                    route.appendChild(document.createTextNode(Math.round((data.matrix[j-1][cm[i][j]]-data.visits[j-1])/60)+" min"));
+                    vtime+=Math.round(sites[cm[i][j]-1].visit);
+                    var list=day.appendChild(document.createElement('li'));
+                    list.style.marginBottom ="90px";
+                    list.style.marginTop ="90px";
+                    if(j%2==0) list.className="timeline-inverted";
+                    var badge=list.appendChild(document.createElement('div'));
+                    badge.className="timeline-badge success";
+                    var icon=badge.appendChild(document.createElement('i'));
+                    icon.className="glyphicon glyphicon-eye-open";
+                    var panel=list.appendChild(document.createElement('div'));
+                    panel.className="timeline-panel";
+                    var heading=panel.appendChild(document.createElement('div'));
+                    heading.className="timeline-heading";
+                    var title=heading.appendChild(document.createElement('H4'));
+                    title.className="timeline-title";
+                    title.innerHTML=sites[cm[i][j]-1].properties.title;
+                    var body=panel.appendChild(document.createElement('div'));
+                    body.className="timeline-body";
+                    var duration=body.appendChild(document.createElement("div"));
+                    duration.appendChild(document.createElement("STRONG")).innerHTML="Visit duration: ";
+                    duration.appendChild(document.createTextNode(Math.round(sites[cm[i][j]-1].visit)+" minutes"));
+                    var openining=body.appendChild(document.createElement("div"));
+                    openining.appendChild(document.createElement("STRONG")).innerHTML="Opening hours: ";
+                    openining.appendChild(document.createElement("BR"));
+                    openining.appendChild(document.createTextNode(sites[cm[i][j]-1].properties.periode_ouverture));
+                    body.appendChild(document.createElement("STRONG")).innerHTML="addresse:";
+                    body.appendChild(document.createElement("BR"));
+                    var address=body.appendChild(document.createElement("P"));
+                    address.appendChild(document.createTextNode(sites[cm[i][j]-1].properties.adresse));
+                    address.appendChild(document.createElement("BR"));
+                    address.appendChild(document.createTextNode(sites[cm[i][j]-1].properties.cp+" ,"+sites[cm[i][j]-1].properties.departements));
+                    address.style.color="#5cb85c";
+                }
+                summary.appendChild(document.createElement("STRONG")).innerHTML="Total visiting time: "+Math.floor(vtime/60)+ " hours & "+ vtime%60 +" minutes.";
+                summary.appendChild(document.createElement("BR"));
+                summary.appendChild(document.createElement("STRONG")).innerHTML="Total commuting time: "+Math.floor((combi.bestcost.time[i]-vtime*60)/3600)+ " hours & "+ Math.floor(((combi.bestcost.time[i]-vtime*60)/60)%60) +" minutes.";
+                var list=day.appendChild(document.createElement('li'));
+                list.style.marginBottom ="90px";
+                list.style.marginTop ="90px";
+                var route=list.appendChild(document.createElement('div'));
+                route.className="fancyroute";
+                var icon=route.appendChild(document.createElement('i')).className="fa fa-car";
+                route.appendChild(document.createElement("BR"));
+                route.appendChild(document.createTextNode(Math.round((data.matrix[j-1][cm[i][j]]-data.visits[j-1])/60)+" min"));
+                var list=day.appendChild(document.createElement('li'));
+                var badge=list.appendChild(document.createElement('div'));
+                badge.className="timeline-badge";
+                var icon=badge.appendChild(document.createElement('i'));
+                list.style.marginBottom ="90px";
+                icon.className="glyphicon glyphicon-home";
+                }
+
+

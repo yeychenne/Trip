@@ -2,19 +2,14 @@
   "name": "Trip",
   "version": "0.0.1",
   "description": "Trip planner",
-  "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon server.js"
+    "start": "node server.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "Trip"
-  },
-  "author": "Maha",
-  "license": "MIT",
+  "repository": {},
+
   "dependencies": {
     "express": "~4.12.0",
+    "cfenv": "1.0.x",
     "jade": "~1.9.2",
     "nib": "~1.1.0",
     "stylus": "0.51.1",
@@ -37,8 +32,7 @@
     "serve-favicon" : "*",
     "google-distance-matrix" :"*"
  },
-
-  "engines": {
-    "node": "0.10"
-  }
+ "engines": {
+                "node": ">=0.10.0"
+              }
 }

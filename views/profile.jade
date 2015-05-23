@@ -6,7 +6,8 @@ html(lang='en')
         //- load bootstrap css
         link(rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css") 
         //- Load fonts
-        link(rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css") 
+        link(rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css")
+        link(rel="stylesheet" href="/stylesheets/mapstyle.css" )
         //-load datepicker css
         link(rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.0/css/bootstrap-datepicker.css")
         //- JQuery and Angular
@@ -35,32 +36,33 @@ html(lang='en')
         //- Add trip
         div.jumbotron
             div.page-header.text-center
-                h2 Let's start a trip
-                div.alert.alert-info
-                    form(action="/newtrip" method="post")
-                        h3 Step 1: Pick a date
-                        div(id="tripdates")
-                            div.input-daterange.input-group(id="datepicker")
-                                span.input-group-addon From: 
-                                input(type="text" class="input-sm form-control" placeholder="start" name="start_date")
-                                br
-                                span.input-group-addon To: 
-                                input(type="text" class="input-sm form-control" placeholder="end" name="end_date")
-                                br
+                h2 Let's start a new trip
+                div.container
+                    div.alert.alert-success
+                        form(action="/newtrip" method="post")
+                            h3 Step 1: Pick a date
+                            div(id="tripdates")
+                                div.input-daterange.input-group(id="datepicker")
+                                    span.input-group-addon From: 
+                                    input(type="text" class="input-sm form-control" placeholder="start" name="start_date" required)
+                                    br
+                                    span.input-group-addon To: 
+                                    input(type="text" class="input-sm form-control" placeholder="end" name="end_date" required)
+                                    br
 
-                        h3 Step 2: Choose a fancy name
-                        div.input-group
-                            span.input-group-addon
-                                i.fa.fa-suitcase
-                            input(type="text" class="input-sm form-control" placeholder="My fabulous trip to Paris" name="name")
-                        h3 Step 3: Your address in Paris
-                        input(id="stayat" type="text" size="50" placeholder="My address")
-                        input(id="textaddress" type="hidden" name="textaddress" value="")
-                        input(id="lat" type="hidden"  name="lat", value="")
-                        input(id="lng" type="hidden"  name="lng", value="")
-                        br
-                        br
-                        button(type="submit" class="btn btn-info") Submit
+                            h3 Step 2: Choose a fancy name
+                            div.input-group
+                                span.input-group-addon
+                                    i.fa.fa-suitcase
+                                input(type="text" class="input-sm form-control" placeholder="My fabulous trip to Paris" name="name" required)
+                            h3 Step 3: Your address in Paris
+                            input(id="stayat" type="text" size="50" placeholder="My address" required)
+                            input(id="textaddress" type="hidden" name="textaddress" value="")
+                            input(id="lat" type="hidden"  name="lat", value="")
+                            input(id="lng" type="hidden"  name="lng", value="")
+                            br
+                            br
+                            button(type="submit" class="btn btn-default") Submit
                     
                     script.
                         $('#tripdates .input-daterange').datepicker({format: "yyyy-mm-dd", startDate: "today",todayHighlight: true});
@@ -153,7 +155,7 @@ html(lang='en')
                 //-Google info
                 div.col-sm-4
                     div.well
-                        h3.text-primary
+                        h3.text-danger
                             span.fa.fa-google-plus  Google
 
                         if (user.google.token)

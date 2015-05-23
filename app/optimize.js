@@ -6,8 +6,7 @@ var Trip   = require('./models').Trip;
 var Site   = require('./models').Site;
 var configAuth = require('../config/auth');
 gm.key(configAuth.googleAuth.APIkey);
-module.exports = function(app) {
-
+module.exports = function(app, appEnv) {
 // Trip Optimization Data =============================================
     app.get('/optimize/data/:id', function (req, res) {
         var id = req.params.id;
@@ -24,12 +23,12 @@ module.exports = function(app) {
                 if (trip) {
                 origins.push(trip.stayaddress.coordinates[0]+','+trip.stayaddress.coordinates[1]);
                 visits.push(0);
-                var days=(Date.parse(trip.end_date)-Date.parse(trip.start_date))/86400000;
+                var days=(Date.parse(trip.end_date)-Date.parse(trip.start_date))/86400000+1;
                 Site.find({'_id': { $in:trip.sites}}).lean().exec(function(err, sites){
                     for (var i=0; i<sites.length;i++){
                         nodes.push(sites[i]._id);
                         origins.push(sites[i].geometry.coordinates[1]+","+sites[i].geometry.coordinates[0]);
-                        visits.push(Math.round(sites[i].visit));
+                        visits.push(Math.round(sites[i].visit*60));
                         }
                     var nodes_size=nodes.length;
                     gm.matrix(origins, origins, function (err, distances) {
@@ -40,8 +39,9 @@ module.exports = function(app) {
                                 for (var j=0;j<nodes_size;j++)
                                     dis[i][j]=distances.rows[i].elements[j].duration.value+visits[i];
                             }
-                            res.json({days: days, nodes:nodes,visits:visits, matrix:dis});
-                    }});
+                            res.json({days: days, nodes:nodes,visits:visits, matrix:dis, trip:trip,sites:sites});
+                    }
+                    else console.log("Cannot get Distance Matrix"+distances.status);});
                     });
             } else
                     console.log("Something went wrong");
@@ -55,27 +55,26 @@ module.exports = function(app) {
         var id = req.params.id;
         while(id.charAt(0) === ':')
             id = id.substr(1);
-        console.log(id);
         var options = {
         hostname: '127.0.0.1'
-        ,port: '3000'
+        ,port: appEnv.port
         ,path: '/optimize/data/:'+id
         ,headers: { 'Content-Type': 'application/json' }
         };
         var req = http.get(options, function(response) {
           response.on('data', function (optData) {
                var data=JSON.parse(optData);
-               console.log(data);
                var D=data.matrix;
                var n=data.nodes.length-1;
                var days=data.days;
-               var delta=21600; //6 hours per day
-               var mybest=roulette(n,delta,D,days,1000)
-               console.log("Top = " +mybest.bestcomb+" of cost:"+ mybest.bestcost);
-               res.render('optimize',{combi: mybest.bestcomb, data:data});
+               var delta=28800; //8 hours per day
+               var mybest=roulette(n,delta,D,days,100);
+               console.log("Sent data:")
+               console.log(JSON.stringify(mybest));
+               console.log(JSON.stringify(data));
+               res.render('optimize',{combi: mybest, data:data});
           });
         });
-        
     });
 
 
@@ -105,7 +104,7 @@ module.exports = function(app) {
         console.log("combi 2 :"+exp);
         console.log("Cost 2 ="+c2);
         console.log("here's a roulete test:")
-        var mybest=roulette(n,delta,D,days,1000)
+        var mybest=roulette(n,delta,D,days,100)
         console.log("Top = " +mybest.bestcomb+" of cost:"+ mybest.bestcost);
         res.send("running");
     });
@@ -115,7 +114,6 @@ function combi(n,delta,D,days){
     //D distance matrix
     //delta is the day duration
     //days is the number of days in the trip
-    var maxPerDay=Math.floor(n/days)+1;
     var tovisit = [];
     for (var i = 1; i <= n; i++) {
         tovisit.push(i);
@@ -127,14 +125,14 @@ function combi(n,delta,D,days){
     }
     for(var i=0;i<days;i++){ //Looping over days
         var time=0;
-    for (var j=1;j<=maxPerDay;j++){
+    for (var j=1;j<=n;j++){
         var iters=0;
         var temp;
         do {
             temp=Math.floor(Math.random()*(tovisit.length-1));
             iters++;}
-            while(time+D[prop[i][j-1]][tovisit[temp]]>delta)
-        if(iters>=n*n) break;
+            while(time+D[prop[i][j-1]][tovisit[temp]]+D[tovisit[temp]][0]>delta && iters<100000)
+        if(time+D[prop[i][j-1]][tovisit[temp]]+D[tovisit[temp]][0]>delta) break;
         prop[i].push(tovisit[temp]);
         tovisit.splice(temp,1);
         time+=D[prop[i][j-1]][prop[i][j]];
@@ -145,25 +143,26 @@ function combi(n,delta,D,days){
     for(var i=0;i<days;i++){
         prop[i].push(0);
     }
-    return prop;
+    return {prop:prop, unvisited:tovisit};
     }
 function costcmb(combix,D){
     // To compare two routes we'll choose the ones with less commuting. we're also favorising well distributed routes.
-    var days=combix.length;
+    var days=combix.prop.length;
     var duration=new Array(days);
     var sum=0;
     var sq=0;
+    if (combix.prop==0) return Number.POSITIVE_INFINITY;
     for(var i=0;i<days;i++){
         duration[i]=0;
-        for(var j=0; j<combix[i].length-1;j++){
-            duration[i]+=D[combix[i][j]][combix[i][j+1]];
+        for(var j=0; j<combix.prop[i].length-1;j++){
+            duration[i]+=D[combix.prop[i][j]][combix.prop[i][j+1]];
         }
         sum+=duration[i];
         sq+=duration[i]*duration[i];
     }
     var average=sum/days;
     var variance=sq/days-average*average;
-    return (variance+average*average);
+    return {cost:variance+average*average, time:duration};
 }
 
 function roulette(n,delta,D,days,maxiters){
@@ -172,7 +171,7 @@ function roulette(n,delta,D,days,maxiters){
     for(var i=0;i<maxiters;i++){
         var altcomb=combi(n,delta,D,days);
         var altcost=costcmb(altcomb,D);
-        if(altcost<bestcost){
+        if(altcost.cost<bestcost.cost){
             bestcomb=altcomb;
             bestcost=costcmb(bestcomb,D);
         }

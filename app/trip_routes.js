@@ -1,6 +1,5 @@
 // File system module
 var fs = require('fs');
-var gm = require('googlemaps');
 // load up the trip model
 var Trip   = require('./models').Trip;
 var Site   = require('./models').Site;
