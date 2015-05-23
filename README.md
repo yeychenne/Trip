@@ -1,5 +1,7 @@
 #Trip planning app
-Innovation project @ECP 
+Innovation project @CentraleSupelec 
+
+hosted on Bluemix [link](http://trip16.mybluemix.net/)
 
 —————————————————
 ###Requisites:
@@ -16,8 +18,8 @@ Innovation project @ECP
 3. Listen to port 3000
 
 ###Config: 
-1. Mongodb database at [databse.js](config/database.js)
-2.  Passport credentials at [auth.js](config/auth.js)
+1. Mongodb database at databse.js
+2.  Passport credentials at auth.js
 
 -------
 ### Project tree:
