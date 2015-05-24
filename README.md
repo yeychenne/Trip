@@ -1,23 +1,25 @@
 #Trip planning app
-Innovation project @CentraleSupelec 
+Innovation project @CentraleSupelec
 
 hosted on Bluemix [link](http://trip16.mybluemix.net/)
 
 —————————————————
 ###Requisites:
-1. Node     [download] (https://nodejs.org/download/)
+1. Node     [download](https://nodejs.org/download/)
 2.  NPM     [download](https://www.npmjs.com/package/npm)
 3.  Mongodb (if running locally)  [download](https://www.mongodb.org/downloads)
 
 
 —————————————————
-###To start app locally:
+###To run the app locally:
 
 1. npm install
-2. npm start  ( require nodemon, alt: run with $node server.js)
-3. Listen to port 3000
+2. npm start  ( or [nodemon](http://nodemon.io/) server.js)
 
-###Config: 
+        server starting on http://localhost:****
+3. Listen to the allocated port
+
+###Config:
 1. Mongodb database at databse.js
 2.  Passport credentials at auth.js
 

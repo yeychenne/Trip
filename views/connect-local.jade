@@ -5,10 +5,10 @@ html(lang='en')
     head
         title  My account
         //- load bootstrap css
-        link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css") 
+        link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css")
         //- Load fonts
         link(rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css")
-        link(rel="stylesheet" href="/stylesheets/mapstyle.css" ) 
+        link(rel="stylesheet" href="/stylesheets/mapstyle.css" )
 
         body(style='padding-top:80px;')
             div.container
@@ -17,13 +17,13 @@ html(lang='en')
                         span.fa.fa-user  Add Local Account
 
                     if (message.length > 0)
-                        div.alert.alert-danger #{message}  
+                        div.alert.alert-danger #{message}
                     //- Form
                     form(action="/connect/local" method="post")
                         div.form-group
                             label(Email)
                             input(type="text" class="form-control" name="email")
-        
+
                         div.form-group
                             label(Password)
                             input(type="password" class="form-control" name="password")

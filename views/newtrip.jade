@@ -1,0 +1,91 @@
+//- profile.jade
+doctype html
+html(lang='en')
+    head
+        title  My Profile
+        //- load bootstrap css
+        link(rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css")
+        //- Load fonts
+        link(rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css")
+        link(rel="stylesheet" href="/stylesheets/mapstyle.css" )
+        //-load datepicker css
+        link(rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.0/css/bootstrap-datepicker.css")
+        //- JQuery and Angular
+        script(src="https://code.jquery.com/jquery-2.0.2.min.js")
+        //-Load Datepicker
+        script(src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.0/js/bootstrap-datepicker.js")
+        //- Google Address autocomplete
+        script(src="https://maps.googleapis.com/maps/api/js?libraries=places")
+        style.
+            body {
+            background: url(/img/5.jpg) no-repeat center fixed;
+            -webkit-background-size: cover;
+            background-size: cover;
+            }
+
+
+
+    body(style='padding-top:80px;')
+        //- Nav bar
+        nav.navbar.navbar-default.navbar-fixed-top
+            div.container-fluid
+                div.navbar-header
+                    a.navbar-brand(href="/profile")  
+                        i.fa.fa-user  Profile
+                div.navbar-right
+                    a.btn.btn-default.navbar-btn(href="/logout") Logout
+
+        //- Add trip
+        div.text-center
+            div.container
+                div.alert.alert-success
+                    form(action="/newtrip" method="post")
+                        h3 Step 1: Pick a date
+                        div(id="tripdates")
+                            div.input-daterange.input-group(id="datepicker")
+                                span.input-group-addon From: 
+                                input(type="text" class="input-sm form-control" placeholder="start" name="start_date" required)
+                                br
+                                span.input-group-addon To: 
+                                input(type="text" class="input-sm form-control" placeholder="end" name="end_date" required)
+                                br
+
+                        h3 Step 2: Choose a fancy name
+                        div.input-group
+                            span.input-group-addon
+                                i.fa.fa-suitcase
+                            input(type="text" class="input-sm form-control" placeholder="My fabulous trip to Paris" name="name" required)
+                        h3 Step 3: Your address in Paris
+                        input(id="stayat" type="text" size="50" placeholder="My address" required)
+                        input(id="textaddress" type="hidden" name="textaddress" value="")
+                        input(id="lat" type="hidden"  name="lat", value="")
+                        input(id="lng" type="hidden"  name="lng", value="")
+                        br
+                        br
+                        button(type="submit" class="btn btn-default") Submit
+
+                script.
+                    $('#tripdates .input-daterange').datepicker({format: "yyyy-mm-dd", startDate: "today",todayHighlight: true});
+                script.
+                    var defaultBounds = new google.maps.LatLngBounds(
+                        new google.maps.LatLng(1.4153305918,48.3691421584),
+                        new google.maps.LatLng(3.4312245109,49.2345906975));
+                    var input = document.getElementById('stayat');
+                    var options = {
+                    bounds: defaultBounds,
+                    types: ['address'],
+                    componentRestrictions: {country: 'fr'}
+                    };
+                    autocomplete = new google.maps.places.Autocomplete(input, options);
+                    google.maps.event.addListener(autocomplete, 'place_changed', function() {
+                        fillInAddress();
+                        });
+                    function fillInAddress() {
+                    // Get the place details from the autocomplete object.
+                    var address = autocomplete.getPlace().formatted_address;
+                    var loc=autocomplete.getPlace().geometry.location;
+                    // Get each component of the address from the place details
+                    document.getElementById("textaddress").value = address;
+                    document.getElementById("lat").value = loc.lat();
+                    document.getElementById("lng").value = loc.lng();
+                    }

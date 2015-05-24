@@ -4,28 +4,26 @@ html(lang='en')
     head
         title  My Profile
         //- load bootstrap css
-        link(rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css") 
+        link(rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css")
         //- Load fonts
         link(rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css")
         link(rel="stylesheet" href="/stylesheets/mapstyle.css" )
-        //-load datepicker css
-        link(rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.0/css/bootstrap-datepicker.css")
-        //- JQuery and Angular
+        //- JQuery
         script(src="https://code.jquery.com/jquery-2.0.2.min.js")
-        //-Load Datepicker
-        script(src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.0/js/bootstrap-datepicker.js")
-        //- Google Address autocomplete
-        script(src="https://maps.googleapis.com/maps/api/js?libraries=places")
-
         style.
-            .redbkg {background-color: #5bc0de;}
-
-
-
+            .btn-thumb{
+                margin-top: 3px;
+                margin-bottom: 3px;
+                height:75px;
+                text-align: center;
+                padding-top: 15px;
+                font-weight: 500;
+                font-size:28px;
+            }
 
     body(style='padding-top:80px;')
         //- Nav bar
-        nav.navbar.navbar-default
+        nav.navbar.navbar-default.navbar-fixed-top
             div.container-fluid
                 div.navbar-header
                     a.navbar-brand(href="/profile")  
@@ -33,66 +31,19 @@ html(lang='en')
                 div.navbar-right
                     a.btn.btn-default.navbar-btn(href="/logout") Logout
 
-        //- Add trip
-        div.jumbotron
-            div.page-header.text-center
-                h2 Let's start a new trip
-                div.container
-                    div.alert.alert-success
-                        form(action="/newtrip" method="post")
-                            h3 Step 1: Pick a date
-                            div(id="tripdates")
-                                div.input-daterange.input-group(id="datepicker")
-                                    span.input-group-addon From: 
-                                    input(type="text" class="input-sm form-control" placeholder="start" name="start_date" required)
-                                    br
-                                    span.input-group-addon To: 
-                                    input(type="text" class="input-sm form-control" placeholder="end" name="end_date" required)
-                                    br
+        //- Trip
+        div.container.text-center
+            div.row
+                div.col-md-4.col-md-offset-2
+                    img(src="img/map.svg" style="width: 200px;height: 164px; margin-bottom:10px;")
+                    a.btn.btn-block.btn-primary.btn-thumb(href="/newtrip")
+                        i.fa.fa-rocket  Start a new Trip
+                div.col-md-4
+                    img(src="img/book.svg" style="width: 200px;height: 164px; margin-bottom:10px;")
+                    a.btn.btn-block.btn-primary.btn-thumb(href="/mytrips")
+                        i.fa.fa-history  Check your trips
 
-                            h3 Step 2: Choose a fancy name
-                            div.input-group
-                                span.input-group-addon
-                                    i.fa.fa-suitcase
-                                input(type="text" class="input-sm form-control" placeholder="My fabulous trip to Paris" name="name" required)
-                            h3 Step 3: Your address in Paris
-                            input(id="stayat" type="text" size="50" placeholder="My address" required)
-                            input(id="textaddress" type="hidden" name="textaddress" value="")
-                            input(id="lat" type="hidden"  name="lat", value="")
-                            input(id="lng" type="hidden"  name="lng", value="")
-                            br
-                            br
-                            button(type="submit" class="btn btn-default") Submit
-                    
-                    script.
-                        $('#tripdates .input-daterange').datepicker({format: "yyyy-mm-dd", startDate: "today",todayHighlight: true});
-                    script.
-                        var defaultBounds = new google.maps.LatLngBounds(
-                            new google.maps.LatLng(1.4153305918,48.3691421584),
-                            new google.maps.LatLng(3.4312245109,49.2345906975));
-                        var input = document.getElementById('stayat');
-                        var options = {
-                        bounds: defaultBounds,
-                        types: ['address'],
-                        componentRestrictions: {country: 'fr'}
-                        };
-                        autocomplete = new google.maps.places.Autocomplete(input, options);
-                        google.maps.event.addListener(autocomplete, 'place_changed', function() {
-                            fillInAddress();
-                            });
-                        function fillInAddress() {
-                        // Get the place details from the autocomplete object.
-                        var address = autocomplete.getPlace().formatted_address;
-                        var loc=autocomplete.getPlace().geometry.location;
-                        // Get each component of the address from the place details
-                        document.getElementById("textaddress").value = address;
-                        document.getElementById("lat").value = loc.lat();
-                        document.getElementById("lng").value = loc.lng();
-                        }
-
-
-
-        //- Account info    
+        //- Account info
 
         div.container
             div.page-header.text-center
@@ -102,50 +53,50 @@ html(lang='en')
 
             div.row
                 //- Local info
-                div.col-sm-4
+                div.col-sm-3(style="text-align: center;")
                     div.well
                         h3
                             span.fa.fa-user  Local
 
                         if (user.local.email)
                             p
-                                strong Username: 
+                                strong
                                 =user.local.email
                             a.btn.btn-defaul(href="/unlink/local") Unlink
 
                         else
                             a.btn.btn-defaul(href="/connect/local") Connect Local
 
-                
+
                 //-Facebok info
-                div.col-sm-4
+                div.col-sm-3(style="text-align: center;")
                     div.well
                         h3.text-primary
                             span.fa.fa-facebook  Facebook
 
                         if (user.facebook.token)
                             p
-                                strong email: 
+                                strong
                                 =user.facebook.email
-                                <br>
-                                strong Name: 
+                                br
+                                strong
                                 =user.facebook.name
                             a.btn.btn-primary(href="/unlink/facebook") Unlink
                         else
                             a.btn.btn-primary(href="/connect/facebook") Connect Facebook
 
                 //-Twitter info
-                div.col-sm-4
+                div.col-sm-3(style="text-align: center;")
                     div.well
                         h3.text-primary
                             span.fa.fa-twitter  Twitter
 
                         if (user.twitter.token)
                             p
-                                strong username: 
+                                strong @
                                 =user.twitter.username
-                                <br>
-                                strong Name: 
+                                br
+                                strong
                                 =user.twitter.displayName
                             a.btn.btn-info(href="/unlink/twitter") Unlink
                         else
@@ -153,19 +104,18 @@ html(lang='en')
 
 
                 //-Google info
-                div.col-sm-4
+                div.col-sm-3(style="text-align: center;")
                     div.well
                         h3.text-danger
                             span.fa.fa-google-plus  Google
 
                         if (user.google.token)
                             p
-                                strong email: 
+                                strong
                                 =user.google.email
-                                <br>
-                                strong Name: 
+                                br
+                                strong
                                 =user.google.name
                             a.btn.btn-danger(href="/unlink/google") Unlink
                         else
                             a.btn.btn-danger(href="/connect/google") Connect Google
-       

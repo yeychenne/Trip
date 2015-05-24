@@ -59,6 +59,10 @@ module.exports = function(app) {
 
 
 // process the new trip form ===========================
+    app.get('/newtrip',function(req, res) {
+        res.render("newtrip");
+    });
+
     app.post('/newtrip',function(req, res) {
         console.log(JSON.stringify(req.body));
         var coordinates=new Array();

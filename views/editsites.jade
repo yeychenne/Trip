@@ -20,15 +20,19 @@ html(lang='en')
 
     body
         //- Nav bar
-        div.navbar.navbar-default
-            div.navbar-header
-                a.navbar-brand(href="/profile")
-                    i.fa.fa-user  Profile
+        nav.navbar.navbar-default.navbar-fixed-top
+            div.container-fluid
+                div.navbar-header
+                    a.navbar-brand(href="/profile")  
+                        i.fa.fa-user  Profile
+                div.navbar-right
+                    a.btn.btn-default.navbar-btn(href="/logout") Logout
+
         div.container-fluid
             div.jumbotron
                 div.row
                     div.col-md-4
-                        h1 Awesome 
+                        h1 Awesome
                         p.lead Let's pick some sites
                         div.progress(id="progress-selection")
                             div.progress-bar.progress-bar-success.progress-bar-striped(role="progressbar" aria-valuenow=20 aria-valuemin="0" aria-valuemax="100" style="width: 20%")

@@ -4,37 +4,37 @@ html(lang='en')
     head
         title Login
         //- load bootstrap css
-        link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css") 
+        link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css")
         //- Load fonts
-        link(rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css") 
+        link(rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css")
         script(src='/js/facebook.js')
+        link(rel="stylesheet" href="/stylesheets/landing.css" )
+        link(rel="stylesheet" href="/stylesheets/bootstrap-social.css" )
         link(rel="stylesheet" href="/stylesheets/mapstyle.css" )
 
-    
-    body(style='padding-top:80px;')
-        div.container
-            div.jumbotron.text-center
-                h2
-                    | Welcome to Trip Planner
 
-                a.btn.btn-default(href="/login")
-                    span.fa.fa-sign-in  Login
+    body(style="padding-top:80px;")
+        div.container(style="background: rgba(13,169,107,0.3); padding-bottom: 60px;")
+            div.jumbotron.text-center(style="background: rgba(0, 0, 0, 0); ")
+                h1(style="font-weight:200;")
+                    | Plan your trip to Paris
+                div.col-md-6.col-md-offset-3
+                    a.btn.btn-dark(type="button" href="/login")
+                        span.fa.fa-sign-in  Login
+                    br
+                    h4(style="font-weight:600;") Or register with:
+                    a.btn.btn-warning(href="/signup")
+                        i.fa.fa-user-plus  Email
+                    br
+                    a.btn.btn-google(href="/auth/google")
+                        i.fa.fa-google-plus  Google
+                    br
+                    a.btn.btn-facebook(href="/auth/facebook")
+                        i.fa.fa-facebook  Facebook
+                    br
+                    a.btn.btn-twitter(href="/auth/twitter")
+                        i.fa.fa-twitter  Twitter
 
-                p Or Register with:
 
-                a.btn.btn-default(href="/signup")
-                    span.fa.fa-user-plus  Email
-                a.btn.btn-default(href="/auth/google") 
-                    span.fa.fa-google-plus  Google
-
-                <br>
-                a.btn.btn-default(href="/auth/facebook") 
-                    span.fa.fa-facebook  Facebook
-                a.btn.btn-default(href="/auth/twitter") 
-                    span.fa.fa-twitter  Twitter
-                
-                
-                p
-                    div.fb-like(data-href="https://www.facebook.com/ecolecentraleparis" data-layout="button_count" data-action="like" data-show-faces="true" data-share="false")
-        
-    
+                    p
+                        div.fb-like(data-href="https://www.facebook.com/ecolecentraleparis" data-layout="button_count" data-action="like" data-show-faces="true" data-share="false")

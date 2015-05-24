@@ -20,10 +20,14 @@ html
 
     body
         //- Nav bar
-        div.navbar.navbar-default
-            div.navbar-header
-                a.navbar-brand(href="/profile")
-                    i.fa.fa-user  Profile
+        nav.navbar.navbar-default.navbar-fixed-top
+            div.container-fluid
+                div.navbar-header
+                    a.navbar-brand(href="/profile")  
+                        i.fa.fa-user  Profile
+                div.navbar-right
+                    a.btn.btn-default.navbar-btn(href="/logout") Logout
+
         div.container
             div.jumbotron
                     h1 Your trip ~ #{data.trip.name}
@@ -54,8 +58,8 @@ html
                 var icon=badge.appendChild(document.createElement('i'));
                 list.style.marginBottom ="90px";
                 icon.className="glyphicon glyphicon-home";
-                
-                
+
+
                 for(var j=1;j<cm[i].length-1;j++){
                     var list=day.appendChild(document.createElement('li'));
                     list.style.marginBottom ="90px";
