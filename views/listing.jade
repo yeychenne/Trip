@@ -1,0 +1,53 @@
+//- listing.jade
+doctype html
+html(lang='en')
+    head
+        title  My trips
+        //- load bootstrap css
+        link(rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css")
+        //- Load fonts
+        link(rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css")
+        //-load datepicker css
+        link(rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.0/css/bootstrap-datepicker.css")
+        //- JQuery
+        script(src="https://code.jquery.com/jquery-2.0.2.min.js")
+        link(rel="stylesheet" href="/stylesheets/mapstyle.css" )
+        style.
+            a:hover, a:focus, a:active { background-color:  rgb(215,253,210) ;
+            text-decoration: none;
+            border-color: red;}
+            .row .thumbnail:hover,.row .thumbnail:focus,.row .thumbnail:active {
+            border:0.2;
+            box-shadow:0;
+            border-radius:0;
+            border-color:#777;}
+    body
+        //- Nav bar
+        nav.navbar.navbar-default.navbar-fixed-top
+            div.container-fluid
+                div.navbar-header
+                    a.navbar-brand(href="/profile")  
+                        i.fa.fa-user  Profile
+                div.navbar-right
+                    a.btn.btn-default.navbar-btn(href="/logout") Logout
+
+        div.container(style="margin-top:70px;")
+            div.jumbotron.text-center
+                div.row(id="thumbs")
+        script.
+            var thumbs=document.getElementById('thumbs');
+            var trips=!{JSON.stringify(trips)};
+            for(var i=0;i<trips.length;i++){
+            var col=thumbs.appendChild(document.createElement('div'));
+            col.className="col-xs-6 col-md-3";
+            var th=col.appendChild(document.createElement('a'));
+            th.style.height="100px";
+            th.style.paddingTop="5px";
+            th.style.paddingBottom="auto";
+            th.className="thumbnail";
+            var content=th.appendChild(document.createElement('H3'));
+            content.innerHTML="Trip "+trips[i].name;
+            th.appendChild(document.createTextNode("From "+trips[i].start_date+" to "+trips[i].end_date));
+            th.href="/trip/:"+trips[i]._id;
+            }
+

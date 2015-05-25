@@ -33,21 +33,34 @@ html
                     h1 Your trip ~ #{data.trip.name}
                     h2 From #{data.trip.start_date} to #{data.trip.end_date}
                     p Staying at " #{data.trip.stayaddress.name}"
+                    p Visiting #{data.trip.sites.length} sites
+                    div.col-md-3.col-md-offset-3
+                        form(action="/saveplanning" method="post")
+                            input(type='hidden' name='combi' value=[] id="savecombi")
+                            input(type='hidden' name='meta' value="" id="meta")
+                            input(type='hidden' name='sdata' value="" id="sdata")
+                            button.btn.btn-success(type='submit' id='submit') Save Planning
             div.container-fuild
                 div.container.pad2(id="planning")
 
         script.
+            var savecombi= document.getElementById('savecombi');
             var planning= document.getElementById('planning');
+            var meta= document.getElementById('meta');
+            var sdata=document.getElementById('sdata');
             var data=!{JSON.stringify(data)};
             var combi=!{JSON.stringify(combi)};
             var cm=combi.bestcomb.prop
+            savecombi.value=cm;
             var trip=data.trip;
+            meta.value=trip._id;
             var sites=data.sites;
+            sdata.value=data.nodes;
             var D=data.matrix;
             for(var i=0;i<data.days;i++){
                 var vtime=0;
                 var titleDay=planning.appendChild(document.createElement('H3'));
-                titleDay.innerHTML="Day "+(i+1);
+                titleDay.innerHTML="Day "+(i+1)+" - "+(cm[i].length-2)+" sites";
                 var summary=planning.appendChild(document.createElement('div'));
                 summary.className="bs-callout bs-callout-info";
                 var day=planning.appendChild(document.createElement('ul'));

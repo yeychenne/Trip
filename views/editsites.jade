@@ -2,7 +2,7 @@
 doctype html
 html(lang='en')
     head
-        title  My trip
+        title  Sites selection
         //- load bootstrap css
         link(rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css")
         //- Load fonts
@@ -34,8 +34,8 @@ html(lang='en')
                     div.col-md-4
                         h1 Awesome
                         p.lead Let's pick some sites
-                        div.progress(id="progress-selection")
-                            div.progress-bar.progress-bar-success.progress-bar-striped(role="progressbar" aria-valuenow=20 aria-valuemin="0" aria-valuemax="100" style="width: 20%")
+                        div.progress.progress-striped.active(id="progress-selection")
+                            div.progress-bar.progress-bar-success(role="progressbar"  aria-valuenow="5" aria-valuemin="0" aria-valuemax="100" style="width: 5%")
                     div.col-md-8.pad2(style="border-style:dotted;height:90%;border-color:#A0A0A0;border-width: 1px;")
                         div.row(style="padding:10px;")
                             div(style="margin-left: 47%;")
@@ -71,6 +71,7 @@ html(lang='en')
             var tosend = document.getElementById('tosend');
             var meta = document.getElementById('meta');
             var trip=!{JSON.stringify(trip)};
+            var days=(Date.parse(trip.end_date)-Date.parse(trip.start_date))/86400000+1;
             meta.value=trip._id;
             var selected= [];
             var locations = L.mapbox.featureLayer().addTo(map);
@@ -146,6 +147,9 @@ html(lang='en')
                 sub.disabled=true;
                 }else
                 sub.disabled=false;
+                var prog=document.getElementById('progress-selection');
+                var valeur=parseInt(cnt.innerHTML)*100/(2*days);
+                $('.progress-bar').css('width', valeur+'%').attr('aria-valuenow', valeur);
                 }
                 locale.on('click', function(e) {
                 //-1. center the map on the selected marker.

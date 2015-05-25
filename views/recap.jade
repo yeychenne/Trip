@@ -22,16 +22,18 @@ html(lang='en')
                 div.navbar-right
                     a.btn.btn-default.navbar-btn(href="/logout") Logout
 
-        div.container-fluid
-            div.jumbotron
+        div.container(style="margin-top:70px;")
+            div.jumbotron.text-center
                 h1 Your trip ~ #{trip.name}
                 h2 From #{trip.start_date} to #{trip.end_date}
                 h3 Staying at " #{trip.stayaddress.name}"
                 div.container-fuild
                     h3 You've selected #{trip.sites.length} sites:
                     div.container-fuild(id="sites",style="max-height:200px;")
+                br
                 div.col-md-4.col-md-offset-4
-                    a(type="submit" class="btn btn-success btn-lg" href='/optimize/:'+trip.id) Let the magic begin
+                    a(type="submit" class="btn btn-success btn-lg" href='/optimize/:'+trip.id) Get your trip optimized
+                br
 
         script.
             var selected= document.getElementById('sites');
@@ -39,5 +41,5 @@ html(lang='en')
             for(var i=0; i<jsonsites.length; i++){
                 var el=selected.appendChild(document.createElement('div'));
                 el.innerHTML=jsonsites[i].properties.title;
-                el.className="btn btn-default btn-custom"
+                el.className="btn btn-default btn-custom";
             }

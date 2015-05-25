@@ -4,6 +4,10 @@ var mongoose = require('mongoose');
 var bcrypt   = require('bcrypt-nodejs');
 
 // define the schema for our user model
+
+var TwoDArray = new mongoose.Schema({
+    values  : Array
+});
 var UserSchema = new mongoose.Schema({
 
     local            : {
@@ -68,7 +72,11 @@ var TripSchema = new mongoose.Schema({
     sites: [{type :mongoose.Schema.ObjectId, ref: 'SiteSchema'},],
     stayaddress   : {name: String, coordinates :Array},
     feedback  : String,
-    updated_at : Date
+    updated_at : Date,
+    planning : {
+        combi : String,
+        sites : String
+    }
 });
 
 

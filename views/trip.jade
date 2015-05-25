@@ -1,0 +1,64 @@
+//- trip.jade
+doctype html
+html
+    head
+        title  Trip summary
+        //- load bootstrap css
+        link(rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css")
+        //- Load fonts
+        link(rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css")
+        //-load datepicker css
+        link(rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.0/css/bootstrap-datepicker.css")
+        //- JQuery
+        script(src="https://code.jquery.com/jquery-2.0.2.min.js")
+        //- mapbox
+        script(src='https://api.tiles.mapbox.com/mapbox.js/v2.1.9/mapbox.js')
+        link(href='https://api.tiles.mapbox.com/mapbox.js/v2.1.9/mapbox.css' rel='stylesheet')
+        link(rel="stylesheet" href="/stylesheets/mapstyle.css" )
+    body
+        //- Nav bar
+        nav.navbar.navbar-default.navbar-fixed-top
+            div.container-fluid
+                div.navbar-header
+                    a.navbar-brand(href="/profile")  
+                        i.fa.fa-user  Profile
+                div.navbar-right
+                    a.btn.btn-default.navbar-btn(href="/logout") Logout
+        div.container
+            div.jumbotron
+                    h1(id="test")
+                    h1 Your trip ~ #{trip.name}
+                    h2 From #{trip.start_date} to #{trip.end_date}
+                    p Staying at " #{trip.stayaddress.name}"
+                    p Visiting #{trip.sites.length} sites :
+                    div.container-fuild(id="sites",style="max-height:200px;")
+        div.container-fuild
+                div.container.pad2(id="planning")
+        script.
+            var selected= document.getElementById('sites');
+            var test= document.getElementById('test');
+            var sites=!{JSON.stringify(sites)};
+            for(var i=0; i<sites.length; i++){
+                var el=selected.appendChild(document.createElement('div'));
+                el.innerHTML=sites[i].properties.title;
+                el.className="btn btn-default btn-custom";
+            }
+            var planning= document.getElementById('planning');
+            var trip=!{JSON.stringify(trip)};
+            var days=(Date.parse(trip.end_date)-Date.parse(trip.start_date))/86400000+1;
+            var combi=trip.planning.combi.split(',');
+            var cursor=1;
+            for (var i=0;i<days;i++){
+                var day=planning.appendChild(document.createElement('div'));
+                day.className="bs-callout bs-callout-success";
+                day.appendChild(document.createElement("STRONG")).innerHTML="Day "+(i+1)+":";
+                day.appendChild(document.createElement('BR'));
+                while(combi[cursor]!=0){
+                var count=0;
+                var el=day.appendChild(document.createElement('div'));
+                el.innerHTML=sites[combi[cursor]-1].properties.title;
+                el.className="btn btn-default btn-custom";
+                cursor++;
+                }
+                cursor+=2;
+                }

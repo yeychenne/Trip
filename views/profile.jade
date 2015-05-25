@@ -40,7 +40,7 @@ html(lang='en')
                         i.fa.fa-rocket  Start a new Trip
                 div.col-md-4
                     img(src="img/book.svg" style="width: 200px;height: 164px; margin-bottom:10px;")
-                    a.btn.btn-block.btn-primary.btn-thumb(href="/mytrips")
+                    a.btn.btn-block.btn-primary.btn-thumb(type="submit" href='/mytrips/:'+user.id)
                         i.fa.fa-history  Check your trips
 
         //- Account info
@@ -62,10 +62,10 @@ html(lang='en')
                             p
                                 strong
                                 =user.local.email
-                            a.btn.btn-defaul(href="/unlink/local") Unlink
+                            a.btn.btn-defaul(href="/unlink/local" id="unlinkLO" onclick="disablebuttons()") Unlink
 
                         else
-                            a.btn.btn-defaul(href="/connect/local") Connect Local
+                            a.btn.btn-defaul(href="/connect/local" onclick="disablebuttons()") Connect Local
 
 
                 //-Facebok info
@@ -81,9 +81,9 @@ html(lang='en')
                                 br
                                 strong
                                 =user.facebook.name
-                            a.btn.btn-primary(href="/unlink/facebook") Unlink
+                            a.btn.btn-primary(href="/unlink/facebook" id="unlinkFB" onclick="disablebuttons()") Unlink
                         else
-                            a.btn.btn-primary(href="/connect/facebook") Connect Facebook
+                            a.btn.btn-primary(href="/connect/facebook" onclick="disablebuttons()") Connect Facebook
 
                 //-Twitter info
                 div.col-sm-3(style="text-align: center;")
@@ -98,9 +98,9 @@ html(lang='en')
                                 br
                                 strong
                                 =user.twitter.displayName
-                            a.btn.btn-info(href="/unlink/twitter") Unlink
+                            a.btn.btn-info(href="/unlink/twitter" id="unlinkTW" onclick="disablebuttons()") Unlink
                         else
-                            a.btn.btn-info(href="/connect/twitter") Connect Twitter
+                            a.btn.btn-info(href="/connect/twitter" onclick="disablebuttons()") Connect Twitter
 
 
                 //-Google info
@@ -116,6 +116,33 @@ html(lang='en')
                                 br
                                 strong
                                 =user.google.name
-                            a.btn.btn-danger(href="/unlink/google") Unlink
+                            a.btn.btn-danger(href="/unlink/google" id="unlinkGO" onclick="disablebuttons()") Unlink
                         else
-                            a.btn.btn-danger(href="/connect/google") Connect Google
+                            a.btn.btn-danger(href="/connect/google" onclick="disablebuttons()") Connect Google
+                script.
+                    function disablebuttons() {
+                    var TW=document.getElementById("unlinkTW");
+                    var FB=document.getElementById("unlinkFB");
+                    var GO=document.getElementById("unlinkGO");
+                    var LO=document.getElementById("unlinkLO");
+                    var TWB, FBB, GOB,LOB;
+                    if(user.twitter.token)
+                        TWB=0;
+                    else TWB=1;
+                    if(user.facebook.token)
+                        FBB=0;
+                    else FBB=1;
+                    if(user.google.token)
+                        GOB=0
+                    else GOB=1;
+                    if(user.local.email)
+                        LOB=0;
+                    else LOB=1;
+                    if(TWB+FBB+GOB+LOB>=3){
+                        TW.disabled=true;
+                        FB.disabled=true;
+                        GO.disabled=true;
+                        LO.disabled=true;
+                    }
+                    }
+

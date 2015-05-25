@@ -10,8 +10,8 @@ module.exports = function(app, appEnv) {
 // Trip Optimization Data =============================================
     app.get('/optimize/data/:id', function (req, res) {
         var id = req.params.id;
-        var nodes=["s"];
         var origins=[];
+        var nodes=["s"];
         var visits=[];
         var dis;
         while(id.charAt(0) === ':')
@@ -26,22 +26,24 @@ module.exports = function(app, appEnv) {
                 var days=(Date.parse(trip.end_date)-Date.parse(trip.start_date))/86400000+1;
                 Site.find({'_id': { $in:trip.sites}}).lean().exec(function(err, sites){
                     for (var i=0; i<sites.length;i++){
-                        nodes.push(sites[i]._id);
                         origins.push(sites[i].geometry.coordinates[1]+","+sites[i].geometry.coordinates[0]);
+                        nodes.push(sites[i]._id);
                         visits.push(Math.round(sites[i].visit*60));
                         }
-                    var nodes_size=nodes.length;
+                    var nodes_size=origins.length;
                     gm.matrix(origins, origins, function (err, distances) {
                         if (!err){
+                            console.log(distances);
                             dis=new Array(nodes_size);
                             for (var i=0;i<nodes_size;i++){
                                 dis[i]=new Array(nodes_size);
                                 for (var j=0;j<nodes_size;j++)
                                     dis[i][j]=distances.rows[i].elements[j].duration.value+visits[i];
                             }
-                            res.json({days: days, nodes:nodes,visits:visits, matrix:dis, trip:trip,sites:sites});
+                            console.log("Sent: "+{days: days,visits:visits, matrix:dis, trip:trip,sites:sites, nodes:nodes});
+                            res.json({days: days,visits:visits, matrix:dis, trip:trip,sites:sites, nodes:nodes});
                     }
-                    else console.log("Cannot get Distance Matrix"+distances.status);});
+                    else console.log("Cannot get Distance Matrix "+distances.status);});
                     });
             } else
                     console.log("Something went wrong");
@@ -65,7 +67,7 @@ module.exports = function(app, appEnv) {
           response.on('data', function (optData) {
                var data=JSON.parse(optData);
                var D=data.matrix;
-               var n=data.nodes.length-1;
+               var n=data.sites.length;
                var days=data.days;
                var delta=28800; //8 hours per day
                var mybest=roulette(n,delta,D,days,100);

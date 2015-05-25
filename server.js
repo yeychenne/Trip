@@ -66,6 +66,9 @@ function compile(str, path) {
   app.use(errorhandler());
 
 //Passport settings ====================================================================
+if(appEnv.isLocal)
+require('./config/passportLoc')(passport); // pass passport for configuration
+else
 require('./config/passport')(passport); // pass passport for configuration
 app.use(session({ secret: 'ibminnoproject2016'})); // session secret
 app.use(passport.initialize());
