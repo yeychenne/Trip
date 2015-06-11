@@ -68,9 +68,11 @@ module.exports = function(app, appEnv) {
                var data=JSON.parse(optData);
                var D=data.matrix;
                var n=data.sites.length;
+               var visits=data.visits;
+               console.log(visits);
                var days=data.days;
                var delta=28800; //8 hours per day
-               var mybest=roulette(n,delta,D,days,100);
+               var mybest=roulette(n,delta,D,visits,days,100);
                console.log("Sent data:")
                console.log(JSON.stringify(mybest));
                console.log(JSON.stringify(data));
@@ -106,7 +108,7 @@ module.exports = function(app, appEnv) {
         console.log("combi 2 :"+exp);
         console.log("Cost 2 ="+c2);
         console.log("here's a roulete test:")
-        var mybest=roulette(n,delta,D,days,100)
+        var mybest=roulette(n,delta,D,viists,days,100)
         console.log("Top = " +mybest.bestcomb+" of cost:"+ mybest.bestcost);
         res.send("running");
     });
@@ -147,35 +149,36 @@ function combi(n,delta,D,days){
     }
     return {prop:prop, unvisited:tovisit};
     }
-function costcmb(combix,D){
+function costcmb(combix,D,visits){
     // To compare two routes we'll choose the ones with less commuting. we're also favorising well distributed routes.
     var days=combix.prop.length;
+    var Commut=new Array(days);
     var duration=new Array(days);
     var sum=0;
     var sq=0;
     if (combix.prop==0) return Number.POSITIVE_INFINITY;
     for(var i=0;i<days;i++){
-        duration[i]=0;
-        for(var j=0; j<combix.prop[i].length-1;j++){
+        Commut[i]=D[combix.prop[i][0]][combix.prop[i][1]];
+        for(var j=1; j<combix.prop[i].length-1;j++){
+            Commut[i]+=D[combix.prop[i][j]][combix.prop[i][j+1]]-visits[combix.prop[i][j]];
             duration[i]+=D[combix.prop[i][j]][combix.prop[i][j+1]];
         }
-        sum+=duration[i];
-        sq+=duration[i]*duration[i];
+        sum+=Commut[i];
+        sq+=Commut[i]*Commut[i];
     }
-    var average=sum/days;
-    var variance=sq/days-average*average;
-    return {cost:variance+average*average, time:duration};
+    
+    return {cost:sq/days-(sum/days)*(sum/days), time:duration};
 }
 
-function roulette(n,delta,D,days,maxiters){
+function roulette(n,delta,D,visits,days,maxiters){
     var bestcomb=combi(n,delta,D,days); //init
-    var bestcost=costcmb(bestcomb,D);
+    var bestcost=costcmb(bestcomb,D,visits);
     for(var i=0;i<maxiters;i++){
         var altcomb=combi(n,delta,D,days);
-        var altcost=costcmb(altcomb,D);
+        var altcost=costcmb(altcomb,D,visits);
         if(altcost.cost<bestcost.cost){
             bestcomb=altcomb;
-            bestcost=costcmb(bestcomb,D);
+            bestcost=costcmb(bestcomb,D,visits);
         }
     }
     return {bestcomb:bestcomb, bestcost:bestcost};

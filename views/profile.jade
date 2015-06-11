@@ -33,29 +33,31 @@ html(lang='en')
 
         //- Trip
         div.container.text-center
-            div.row
-                div.col-md-4.col-md-offset-2
-                    img(src="img/map.svg" style="width: 200px;height: 164px; margin-bottom:10px;")
-                    a.btn.btn-block.btn-primary.btn-thumb(href="/newtrip")
-                        i.fa.fa-rocket  Start a new Trip
-                div.col-md-4
-                    img(src="img/book.svg" style="width: 200px;height: 164px; margin-bottom:10px;")
-                    a.btn.btn-block.btn-primary.btn-thumb(type="submit" href='/mytrips/:'+user.id)
-                        i.fa.fa-history  Check your trips
+            div.jumbotron
+                div.container
+                    div.col-md-4.col-md-offset-2
+                        img(src="img/map.svg" style="width: 100;height: 82px; margin-bottom:10px;")
+                        br
+                        a.btn.btn-primary(href="/newtrip")
+                            i.fa.fa-rocket  Start a new Trip
+                    div.col-md-4
+                        img(src="img/book.svg" style="width: 100px;height: 82px; margin-bottom:10px;")
+                        br
+                        a.btn.btn-primary(type="submit" href='/mytrips/:'+user.id)
+                            i.fa.fa-history  Check your trips
 
         //- Account info
 
         div.container
             div.page-header.text-center
-                h1
-                    span.fa.fa-anchor  Account information
+                h3 Account information
 
 
             div.row
                 //- Local info
                 div.col-sm-3(style="text-align: center;")
                     div.well
-                        h3
+                        h4
                             span.fa.fa-user  Local
 
                         if (user.local.email)
@@ -71,7 +73,7 @@ html(lang='en')
                 //-Facebok info
                 div.col-sm-3(style="text-align: center;")
                     div.well
-                        h3.text-primary
+                        h4.text-primary
                             span.fa.fa-facebook  Facebook
 
                         if (user.facebook.token)
@@ -88,7 +90,7 @@ html(lang='en')
                 //-Twitter info
                 div.col-sm-3(style="text-align: center;")
                     div.well
-                        h3.text-primary
+                        h4.text-primary
                             span.fa.fa-twitter  Twitter
 
                         if (user.twitter.token)
@@ -106,7 +108,7 @@ html(lang='en')
                 //-Google info
                 div.col-sm-3(style="text-align: center;")
                     div.well
-                        h3.text-danger
+                        h4.text-danger
                             span.fa.fa-google-plus  Google
 
                         if (user.google.token)

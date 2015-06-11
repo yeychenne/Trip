@@ -1,3 +1,5 @@
+var configFSQ=require('./../config/auth.js').fsqAuth;
+var foursquare = (require('foursquarevenues'))(configFSQ.clientId, configFSQ.clientSecret);
 module.exports = function(app, passport) {
 
 // normal routes ===============================================================
@@ -13,6 +15,24 @@ module.exports = function(app, passport) {
             user : req.user
         });
     });
+
+    //What's around me==========================
+    app.get('/around', function(req, res) {
+        var params = {"ll": "40.7,-74"};
+        foursquare.getVenues(params, function(error, venues) {
+        if (!error) {
+            console.log(JSON.stringify(venues));
+            }
+        if(error)
+            console.log(error);
+        });
+        foursquare.exploreVenues(params, function(error, venues) {
+        if (!error) {
+            console.log(venues);
+        }
+        });
+        res.send("Running");
+        });
 
     // LOGOUT ==============================
     app.get('/logout', function(req, res) {

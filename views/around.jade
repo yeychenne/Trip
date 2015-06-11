@@ -1,8 +1,8 @@
-//- success.jade
+//- profile.jade
 doctype html
 html(lang='en')
     head
-        title  Success
+        title  Around me
         //- load bootstrap css
         link(rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css")
         //- Load fonts
@@ -10,6 +10,7 @@ html(lang='en')
         link(rel="stylesheet" href="/stylesheets/mapstyle.css" )
         //- JQuery
         script(src="https://code.jquery.com/jquery-2.0.2.min.js")
+        link(rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4/leaflet.css")
         style.
             .btn-thumb{
                 margin-top: 3px;
@@ -21,12 +22,19 @@ html(lang='en')
                 font-size:28px;
             }
 
-    body(style='padding-top:100px;')
-        div.alert.alert-success.text-center(role="alert")
-            h4 Your planning has been succesfully saved.
-            p(style="font-size: 8pt; font-weight: 100;")
-               a.alert-link(href="/profile") You will be redirected to your profile page
-    script.
-        setTimeout(function () {
-        window.location.href = "/profile"; 
-        }, 3000);
+    body(style='padding-top:80px;')
+        //- Nav bar
+        nav.navbar.navbar-default.navbar-fixed-top
+            div.container-fluid
+                div.navbar-header
+                    a.navbar-brand(href="/profile")  
+                        i.fa.fa-user  Profile
+                div.navbar-right
+                    a.btn.btn-default.navbar-btn(href="/logout") Logout
+        //-Content
+        div.wrapper
+            div.app
+                div.loading
+                div.infobox(id="infobox")
+                div.map bla bla
+        script(src="/js/geoloc.js")

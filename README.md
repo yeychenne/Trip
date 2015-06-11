@@ -1,7 +1,7 @@
 #Trip planning app
 Innovation project @CentraleSupelec
 
-hosted on Bluemix [link](http://trip16.mybluemix.net/)
+hosted on Bluemix [link](http://paristrip.mybluemix.net/)
 
 —————————————————
 ###Requisites:
