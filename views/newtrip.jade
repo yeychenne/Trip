@@ -10,14 +10,14 @@ html(lang='en')
         link(rel="stylesheet" href="/stylesheets/mapstyle.css" )
         //-load datepicker css
         link(rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.0/css/bootstrap-datepicker.css")
-        //- JQuery and Angular
+        link(rel="stylesheet" href="/stylesheets/jquery.timepicker.css")
+        //- JQuery
         script(src="https://code.jquery.com/jquery-2.0.2.min.js")
         //-Load Datepicker
         script(src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.0/js/bootstrap-datepicker.js")
-        link(rel="stylesheet" href="/js/timepicker.css")
         //- Google Address autocomplete
         script(src="https://maps.googleapis.com/maps/api/js?libraries=places")
-        script(src="/js/timepicker.js")
+        script(src="/js/jquery.timepicker.js")
         style.
             body {
             background: url(/img/5.jpg) no-repeat center fixed;
@@ -51,6 +51,12 @@ html(lang='en')
                                 span.input-group-addon To: 
                                 input(type="text" class="input-sm form-control" placeholder="end" name="end_date" required)
                                 br
+                        h3 And your day schedule
+                        div.input-group.col-md-6.col-md-offset-3
+                            span.input-group-addon From:
+                            input(id="starttime" type="text"  name="starttime" class="input-sm form-control")
+                            span.input-group-addon To:
+                            input(id="endtime" type="text"  name="endtime" class="input-sm form-control")
 
                         h3 Step 2: Choose a fancy name
                         div.input-group
@@ -69,7 +75,10 @@ html(lang='en')
                 script.
                     $('#tripdates .input-daterange').datepicker({format: "yyyy-mm-dd", startDate: "today",todayHighlight: true});
                 script.
-                    $('#daystart').timepicker();
+                    $('#starttime').timepicker({ 'forceRoundTime': true ,'minTime':'07:00am', 'maxTime':'16:00pm', 'step':'60'});
+                    $('#endtime').timepicker({ 'forceRoundTime': true, 'minTime':'01:00pm', 'maxTime':'12:00am','step':'60' });
+
+
                 script.
                     var defaultBounds = new google.maps.LatLngBounds(
                         new google.maps.LatLng(1.4153305918,48.3691421584),

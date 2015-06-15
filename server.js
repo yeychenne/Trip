@@ -4,7 +4,7 @@ var express = require('express')
   , cfenv = require('cfenv')
   , app = express()
   , extend = require('util')._extend
-  , http = require('http');
+  , http = require('http')
   , mongoose = require('mongoose')
   , passport = require('passport')
   , flash    = require('connect-flash')
@@ -13,9 +13,7 @@ var express = require('express')
   , morgan       = require('morgan')
   , session      = require('express-session')
   , bodyParser   = require('body-parser')
-  , favicon = require('serve-favicon')
-  , io = require('socket.io').listen(app);
-
+  , favicon = require('serve-favicon');
 
 
 //Config ENV  ======================================================================
@@ -54,15 +52,6 @@ app.use(passport.session()); // persistent login sessions
 app.use(flash()); // use connect-flash for flash messages stored in session
 app.use(favicon(__dirname + '/public/img/favicon.ico'));
 
-//Socket for geolocation
-// listen for incoming connections from client
-io.sockets.on('connection', function (socket) {
-// start listening for coords
-socket.on('send:coords', function (data) {
-   // broadcast your coordinates to everyone except you
-    socket.broadcast.emit('load:coords', data);
-  });
-});
 // routes ======================================================================
 // User relative --------------------------------------------------------------
 require('./app/user_routes.js')(app, passport); // load our routes and pass in our app and fully configured passport

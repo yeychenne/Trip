@@ -117,7 +117,7 @@ html
                 }
                 summary.appendChild(document.createElement("STRONG")).innerHTML="Total visiting time: "+Math.floor(vtime/60)+ " hours & "+ vtime%60 +" minutes.";
                 summary.appendChild(document.createElement("BR"));
-                summary.appendChild(document.createElement("STRONG")).innerHTML="Total commuting time: "+Math.floor((combi.bestcost.time[i]-vtime*60)/3600)+ " hours & "+ Math.floor(((combi.bestcost.time[i]-vtime*60)/60)%60) +" minutes.";
+                summary.appendChild(document.createElement("STRONG")).innerHTML="Total commuting time: "+Math.floor((combi.bestcost.Commut[i])/3600)+ " hours & "+ Math.floor(((combi.bestcost.Commut[i])/60)%60) +" minutes.";
                 var list=day.appendChild(document.createElement('li'));
                 list.style.marginBottom ="90px";
                 list.style.marginTop ="90px";

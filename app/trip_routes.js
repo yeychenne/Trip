@@ -21,6 +21,8 @@ module.exports = function(app) {
             user: req.user,
             start_date : req.body.start_date,
             end_date : req.body.end_date,
+            start_time: req.body.starttime,
+            end_time: req.body.endtime,
             sites: [],
             feedback  : "",
             updated_at : Date.now(),

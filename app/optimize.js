@@ -13,6 +13,7 @@ module.exports = function(app, appEnv) {
         var origins=[];
         var nodes=["s"];
         var visits=[];
+        var openings=[];
         var dis;
         while(id.charAt(0) === ':')
             id = id.substr(1);
@@ -24,30 +25,35 @@ module.exports = function(app, appEnv) {
                 origins.push(trip.stayaddress.coordinates[0]+','+trip.stayaddress.coordinates[1]);
                 visits.push(0);
                 var days=(Date.parse(trip.end_date)-Date.parse(trip.start_date))/86400000+1;
+                var firstday=new Date(Date.parse(trip.start_date)).getDay();
+                var daystart=parseTime(trip.start_time).getHours();
+                var dayend=parseTime(trip.end_time).getHours();
                 Site.find({'_id': { $in:trip.sites}}).lean().exec(function(err, sites){
                     for (var i=0; i<sites.length;i++){
                         origins.push(sites[i].geometry.coordinates[1]+","+sites[i].geometry.coordinates[0]);
                         nodes.push(sites[i]._id);
                         visits.push(Math.round(sites[i].visit*60));
+                        if(sites[i].periods)
+                            openings.push(sites[i].periods);
                         }
                     var nodes_size=origins.length;
                     gm.matrix(origins, origins, function (err, distances) {
                         if (!err){
-                            console.log(distances);
                             dis=new Array(nodes_size);
                             for (var i=0;i<nodes_size;i++){
                                 dis[i]=new Array(nodes_size);
                                 for (var j=0;j<nodes_size;j++)
                                     dis[i][j]=distances.rows[i].elements[j].duration.value+visits[i];
                             }
-                            console.log("Sent: "+{days: days,visits:visits, matrix:dis, trip:trip,sites:sites, nodes:nodes});
-                            res.json({days: days,visits:visits, matrix:dis, trip:trip,sites:sites, nodes:nodes});
+                            console.log("Sent: "+{openings:openings});
+                            res.json({days: days,firstday:firstday, daystart:daystart, dayend:dayend, visits:visits, matrix:dis, trip:trip,sites:sites, nodes:nodes, openings:openings});
                     }
                     else console.log("Cannot get Distance Matrix "+distances.status);});
                     });
             } else
                     console.log("Something went wrong");
             }});
+
     });
 
 
@@ -69,56 +75,34 @@ module.exports = function(app, appEnv) {
                var D=data.matrix;
                var n=data.sites.length;
                var visits=data.visits;
-               console.log(visits);
+               var openings=data.openings;
+               console.log(openings);
                var days=data.days;
-               var delta=28800; //8 hours per day
-               var mybest=roulette(n,delta,D,visits,days,100);
-               console.log("Sent data:")
+               var firstday=data.firstday;
+               var daystart=data.daystart;
+               var dayend=data.dayend;
+               var delta=28800; //8 hours per day from
+               var mybest=roulette(n,delta,D,visits,openings,days,firstday,daystart,dayend,100);
+              /* console.log("Sent data:")
                console.log(JSON.stringify(mybest));
-               console.log(JSON.stringify(data));
+               console.log(JSON.stringify(data));*/
                res.render('optimize',{combi: mybest, data:data});
           });
         });
     });
 
-
-
-
-
-
-    app.get('/test', function (req, res) {
-        var n=8;
-        var delta=50;
-        var days=3;
-        var D=[   [ 0, 5, 3, 4, 5, 6, 8, 11, 1 ],
-                  [ 2, 0, 5, 7, 5, 3, 8, 2, 14 ],
-                  [ 7, 5, 0, 4, 5, 16, 8, 1, 20 ],
-                  [ 5, 5, 3, 0, 15, 22, 8, 14, 21 ],
-                  [ 5, 5, 3, 4, 0, 6, 8, 11, 1 ],
-                  [ 8, 5, 3, 4, 5, 0, 8, 1, 11 ],
-                  [ 6, 5, 3, 4, 5, 6, 0, 4, 7 ],
-                  [ 9, 5, 3, 4, 5, 6, 8, 0, 21 ],
-                  [ 3, 5, 3, 4, 5, 6, 8, 17, 0 ] ];
-        var ex=combi(n,delta,D,days);
-        var c1=costcmb(ex,D);
-        console.log("combi 1 :"+ex);
-        console.log("Cost 1 ="+c1);
-        var exp=combi(n,delta-2,D,days);
-        var c2=costcmb(exp,D);
-        console.log("combi 2 :"+exp);
-        console.log("Cost 2 ="+c2);
-        console.log("here's a roulete test:")
-        var mybest=roulette(n,delta,D,viists,days,100)
-        console.log("Top = " +mybest.bestcomb+" of cost:"+ mybest.bestcost);
-        res.send("running");
-    });
-
-function combi(n,delta,D,days){
+function combi(n,delta,D,openings,days,firstday,daystart,dayend){
     //n is the number of nodes to visit (start=end point not included)
     //D distance matrix
     //delta is the day duration
     //days is the number of days in the trip
     var tovisit = [];
+    var open;
+    var close;
+    var temp;
+    var isopen;
+    var iters;
+    var MAX_ITER=10000;
     for (var i = 1; i <= n; i++) {
         tovisit.push(i);
     }
@@ -128,15 +112,29 @@ function combi(n,delta,D,days){
         prop[i].push(0); //0 for home node
     }
     for(var i=0;i<days;i++){ //Looping over days
-        var time=0;
+        var time=daystart*3600;
+        var day=(daystart+i)%7;
     for (var j=1;j<=n;j++){
-        var iters=0;
-        var temp;
+        iters=0;
         do {
+            // console.log("looking for day="+day);
             temp=Math.floor(Math.random()*(tovisit.length-1));
+            for(var k=0;k<openings[temp].length;k++){
+                // console.log("openings[temp][k].close="+openings[temp][k].close);
+                // console.log("day="+openings[temp][k].close.day);
+                if(openings[temp][k].close.day==day){
+                    // console.log("Matching found");
+                    break;
+                }
+            }
+            if(k<openings[temp].length){
+            close=parseInt(openings[temp][k].close.time.substr(0,2))*3600+parseInt(openings[temp][k].close.time.substr(2,2))*60;
+            open=parseInt(openings[temp][k].open.time.substr(0,2))*3600+parseInt(openings[temp][k].open.time.substr(2,2))*60;
+            isopen=(time+D[prop[i][j-1]][tovisit[temp]]<close && time+D[prop[i][j-1]][tovisit[temp]]>open);
+            }
             iters++;}
-            while(time+D[prop[i][j-1]][tovisit[temp]]+D[tovisit[temp]][0]>delta && iters<100000)
-        if(time+D[prop[i][j-1]][tovisit[temp]]+D[tovisit[temp]][0]>delta) break;
+            while(time+D[prop[i][j-1]][tovisit[temp]]+D[tovisit[temp]][0]>dayend*3600 && iters<MAX_ITER & !isopen)
+        if(time+D[prop[i][j-1]][tovisit[temp]]+D[tovisit[temp]][0]>dayend*3600) break;
         prop[i].push(tovisit[temp]);
         tovisit.splice(temp,1);
         time+=D[prop[i][j-1]][prop[i][j]];
@@ -166,15 +164,15 @@ function costcmb(combix,D,visits){
         sum+=Commut[i];
         sq+=Commut[i]*Commut[i];
     }
-    
-    return {cost:sq/days-(sum/days)*(sum/days), time:duration};
+
+    return {cost:sq/days-(sum/days)*(sum/days), Commut:Commut};
 }
 
-function roulette(n,delta,D,visits,days,maxiters){
-    var bestcomb=combi(n,delta,D,days); //init
+function roulette(n,delta,D,visits,openings,days,firstday,daystart,dayend,maxiters){
+    var bestcomb=combi(n,delta,D,openings,days,firstday,daystart,dayend); //init
     var bestcost=costcmb(bestcomb,D,visits);
     for(var i=0;i<maxiters;i++){
-        var altcomb=combi(n,delta,D,days);
+        var altcomb=combi(n,delta,D,openings,days,firstday,daystart,dayend);
         var altcost=costcmb(altcomb,D,visits);
         if(altcost.cost<bestcost.cost){
             bestcomb=altcomb;
@@ -184,4 +182,23 @@ function roulette(n,delta,D,visits,days,maxiters){
     return {bestcomb:bestcomb, bestcost:bestcost};
 
 }
+function parseTime(timeString) {
+        if (timeString == '') return null;
+
+        var time = timeString.match(/(\d+)(:(\d\d))?\s*(p?)/i);
+        if (time == null) return null;
+
+        var hours = parseInt(time[1],10);
+        if (hours == 12 && !time[4]) {
+              hours = 0;
+        }
+        else {
+            hours += (hours < 12 && time[4])? 12 : 0;
+        }
+        var d = new Date();
+        d.setHours(hours);
+        d.setMinutes(parseInt(time[3],10) || 0);
+        d.setSeconds(0, 0);
+        return d;
+        }
 }

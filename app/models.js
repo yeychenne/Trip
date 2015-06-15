@@ -69,6 +69,8 @@ var TripSchema = new mongoose.Schema({
     user: {type :mongoose.Schema.ObjectId, ref: 'UserSchema'},
     start_date : String,
     end_date : String,
+    start_time: String,
+    end_time : String,
     sites: [{type :mongoose.Schema.ObjectId, ref: 'SiteSchema'},],
     stayaddress   : {name: String, coordinates :Array},
     feedback  : String,
