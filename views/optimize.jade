@@ -34,6 +34,7 @@ html
                     h2 From #{data.trip.start_date} to #{data.trip.end_date}
                     p Staying at " #{data.trip.stayaddress.name}"
                     p Visiting #{data.trip.sites.length} sites
+                    p Times #{combi.bestcomb.times[1]}
                     div.col-md-3.col-md-offset-3
                         form(action="/saveplanning" method="post")
                             input(type='hidden' name='combi' value=[] id="savecombi")
@@ -51,6 +52,7 @@ html
             var data=!{JSON.stringify(data)};
             var combi=!{JSON.stringify(combi)};
             var cm=combi.bestcomb.prop
+            var times=combi.bestcomb.times
             savecombi.value=cm;
             var trip=data.trip;
             meta.value=trip._id;
@@ -58,6 +60,14 @@ html
             sdata.value=data.nodes;
             var D=data.matrix;
             for(var i=0;i<data.days;i++){
+                if (cm[i].length==2) {
+                var titleDay=planning.appendChild(document.createElement('H3'));
+                titleDay.innerHTML="Day "+(i+1);
+                var summary=planning.appendChild(document.createElement('div'));
+                summary.className="bs-callout bs-callout-info";
+                summary.appendChild(document.createElement("STRONG")).innerHTML="A free day, you can visit some extra sites";
+                continue;
+                    }
                 var vtime=0;
                 var titleDay=planning.appendChild(document.createElement('H3'));
                 titleDay.innerHTML="Day "+(i+1)+" - "+(cm[i].length-2)+" sites";
@@ -71,7 +81,9 @@ html
                 var icon=badge.appendChild(document.createElement('i'));
                 list.style.marginBottom ="90px";
                 icon.className="glyphicon glyphicon-home";
-
+                var timing=list.appendChild(document.createElement('div'));
+                var icon=timing.appendChild(document.createElement('i')).className="fa fa-clock-o";
+                timing.appendChild(document.createTextNode(" "+Math.round(times[i][0]/3600)+":"+("0"+Math.round(times[i][0]/60)%60).slice(-2)));
 
                 for(var j=1;j<cm[i].length-1;j++){
                     var list=day.appendChild(document.createElement('li'));
@@ -95,6 +107,9 @@ html
                     panel.className="timeline-panel";
                     var heading=panel.appendChild(document.createElement('div'));
                     heading.className="timeline-heading";
+                    var timing=heading.appendChild(document.createElement('div'));
+                    var icon=timing.appendChild(document.createElement('i')).className="fa fa-clock-o";
+                    timing.appendChild(document.createTextNode(" "+Math.floor(times[i][j]/3600)+":"+("0"+Math.round(times[i][j]/60)%60).slice(-2)));
                     var title=heading.appendChild(document.createElement('H4'));
                     title.className="timeline-title";
                     title.innerHTML=sites[cm[i][j]-1].properties.title;
@@ -114,7 +129,9 @@ html
                     address.appendChild(document.createElement("BR"));
                     address.appendChild(document.createTextNode(sites[cm[i][j]-1].properties.cp+" ,"+sites[cm[i][j]-1].properties.departements));
                     address.style.color="#5cb85c";
+
                 }
+
                 summary.appendChild(document.createElement("STRONG")).innerHTML="Total visiting time: "+Math.floor(vtime/60)+ " hours & "+ vtime%60 +" minutes.";
                 summary.appendChild(document.createElement("BR"));
                 summary.appendChild(document.createElement("STRONG")).innerHTML="Total commuting time: "+Math.floor((combi.bestcost.Commut[i])/3600)+ " hours & "+ Math.floor(((combi.bestcost.Commut[i])/60)%60) +" minutes.";
@@ -125,13 +142,16 @@ html
                 route.className="fancyroute";
                 var icon=route.appendChild(document.createElement('i')).className="fa fa-car";
                 route.appendChild(document.createElement("BR"));
-                route.appendChild(document.createTextNode(Math.round((data.matrix[j-1][cm[i][j]]-data.visits[j-1])/60)+" min"));
+                route.appendChild(document.createTextNode(Math.round((data.matrix[cm[i][j-1]][cm[i][j]]-data.visits[j-1])/60)+" min"));
                 var list=day.appendChild(document.createElement('li'));
                 var badge=list.appendChild(document.createElement('div'));
                 badge.className="timeline-badge";
                 var icon=badge.appendChild(document.createElement('i'));
                 list.style.marginBottom ="90px";
                 icon.className="glyphicon glyphicon-home";
+                var timing=list.appendChild(document.createElement('div'));
+                var icon=timing.appendChild(document.createElement('i')).className="fa fa-clock-o";
+                timing.appendChild(document.createTextNode(" "+Math.floor(times[i][j]/3600)+":"+("0"+Math.round(times[i][j]/60)%60).slice(-2)));
                 }
 
 

@@ -73,6 +73,7 @@ module.exports = function(app, appEnv) {
           response.on('data', function (optData) {
                var data=JSON.parse(optData);
                var D=data.matrix;
+               console.log(D);
                var n=data.sites.length;
                var visits=data.visits;
                var openings=data.openings;
@@ -82,9 +83,9 @@ module.exports = function(app, appEnv) {
                var dayend=data.dayend;
                var delta=28800; //8 hours per day from
                var mybest=roulette(n,delta,D,visits,openings,days,firstday,daystart,dayend,10);
-              /* console.log("Sent data:")
+               console.log("Sent data:")
                console.log(JSON.stringify(mybest));
-               console.log(JSON.stringify(data));*/
+               // console.log(JSON.stringify(data));
                res.render('optimize',{combi: mybest, data:data});
           });
         });
@@ -106,16 +107,17 @@ function combi(n,delta,D,openings,days,firstday,daystart,dayend){
     for (var i = 1; i <= n; i++) {
         tovisit.push(i);
     }
-    console.log("tovisit="+tovisit);
     var prop=new Array(days);
+    var times=new Array(days);
     for(var i=0;i<days;i++){
         prop[i]=new Array();
+        times[i]=new Array();
         prop[i].push(0); //0 for home node
     }
     for(var i=0;i<days;i++){ //Looping over days
         var time=daystart*3600;
         var day=(daystart+i)%7;
-       
+        times[i].push(time);
         for (var j=1;j<=n;j++){
             iters=0;
             do {
@@ -129,17 +131,21 @@ function combi(n,delta,D,openings,days,firstday,daystart,dayend){
             prop[i].push(tovisit[temp]);
             tovisit.splice(temp,1);
             time+=D[prop[i][j-1]][prop[i][j]];
-            console.log("Day:"+i+" Planning thus far: "+prop[i]);
+            times[i].push(time);
+            // console.log("Day:"+i+" Planning thus far: "+prop[i]);
             if(tovisit.length==0) break;
         }
-        console.log("tovisit="+tovisit);
+        // console.log("tovisit="+tovisit);
         if(tovisit.length==0) break;
         }
     for(var i=0;i<days;i++){
+        time=times[i][times[i].length-1]+D[prop[i][prop[i].length-1]][0];
+        if(prop[i].length>1) times[i].push(time);
         prop[i].push(0);
     }
-    console.log(prop);
-    return {prop:prop, unvisited:tovisit};
+    // console.log(prop);
+    // console.log(times);
+    return {prop:prop, unvisited:tovisit, times:times};
     }
 function costcmb(combix,D,visits){
     // To compare two routes we'll choose the ones with less commuting. we're also favorising well distributed routes.
@@ -165,9 +171,8 @@ function costcmb(combix,D,visits){
 function roulette(n,delta,D,visits,openings,days,firstday,daystart,dayend,maxiters){
     var bestcomb=combi(n,delta,D,openings,days,firstday,daystart,dayend); //init
     var bestcost=costcmb(bestcomb,D,visits);
-    console.log("Days:"+days);
     for(var i=0;i<maxiters;i++){
-        console.log('Roll >>'+i);
+        // console.log('Roll >>'+i);
         var altcomb=combi(n,delta,D,openings,days,firstday,daystart,dayend);
         var altcost=costcmb(altcomb,D,visits);
         if(altcost.cost<bestcost.cost){
