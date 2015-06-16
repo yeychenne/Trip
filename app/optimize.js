@@ -45,7 +45,7 @@ module.exports = function(app, appEnv) {
                                 for (var j=0;j<nodes_size;j++)
                                     dis[i][j]=distances.rows[i].elements[j].duration.value+visits[i];
                             }
-                            console.log("Sent: "+{openings:openings});
+                            // console.log("Sent: "+{openings:openings});
                             res.json({days: days,firstday:firstday, daystart:daystart, dayend:dayend, visits:visits, matrix:dis, trip:trip,sites:sites, nodes:nodes, openings:openings});
                     }
                     else console.log("Cannot get Distance Matrix "+distances.status);});
@@ -76,13 +76,12 @@ module.exports = function(app, appEnv) {
                var n=data.sites.length;
                var visits=data.visits;
                var openings=data.openings;
-               console.log(openings);
                var days=data.days;
                var firstday=data.firstday;
                var daystart=data.daystart;
                var dayend=data.dayend;
                var delta=28800; //8 hours per day from
-               var mybest=roulette(n,delta,D,visits,openings,days,firstday,daystart,dayend,100);
+               var mybest=roulette(n,delta,D,visits,openings,days,firstday,daystart,dayend,10);
               /* console.log("Sent data:")
                console.log(JSON.stringify(mybest));
                console.log(JSON.stringify(data));*/
@@ -102,10 +101,12 @@ function combi(n,delta,D,openings,days,firstday,daystart,dayend){
     var temp;
     var isopen;
     var iters;
-    var MAX_ITER=10000;
+    var MAX_ITER=10;
+
     for (var i = 1; i <= n; i++) {
         tovisit.push(i);
     }
+    console.log("tovisit="+tovisit);
     var prop=new Array(days);
     for(var i=0;i<days;i++){
         prop[i]=new Array();
@@ -114,37 +115,30 @@ function combi(n,delta,D,openings,days,firstday,daystart,dayend){
     for(var i=0;i<days;i++){ //Looping over days
         var time=daystart*3600;
         var day=(daystart+i)%7;
-    for (var j=1;j<=n;j++){
-        iters=0;
-        do {
-            // console.log("looking for day="+day);
-            temp=Math.floor(Math.random()*(tovisit.length-1));
-            for(var k=0;k<openings[temp].length;k++){
-                // console.log("openings[temp][k].close="+openings[temp][k].close);
-                // console.log("day="+openings[temp][k].close.day);
-                if(openings[temp][k].close.day==day){
-                    // console.log("Matching found");
-                    break;
+       
+        for (var j=1;j<=n;j++){
+            iters=0;
+            do {
+                // console.log("looking for day="+day);
+                temp=Math.floor(Math.random()*(tovisit.length-1));
+                iters++;
+                var isopen=isOpen((firstday+i)%7,time+D[prop[i][j-1]][tovisit[temp]],openings[temp]);
                 }
-            }
-            if(k<openings[temp].length){
-            close=parseInt(openings[temp][k].close.time.substr(0,2))*3600+parseInt(openings[temp][k].close.time.substr(2,2))*60;
-            open=parseInt(openings[temp][k].open.time.substr(0,2))*3600+parseInt(openings[temp][k].open.time.substr(2,2))*60;
-            isopen=(time+D[prop[i][j-1]][tovisit[temp]]<close && time+D[prop[i][j-1]][tovisit[temp]]>open);
-            }
-            iters++;}
-            while(time+D[prop[i][j-1]][tovisit[temp]]+D[tovisit[temp]][0]>dayend*3600 && iters<MAX_ITER & !isopen)
-        if(time+D[prop[i][j-1]][tovisit[temp]]+D[tovisit[temp]][0]>dayend*3600) break;
-        prop[i].push(tovisit[temp]);
-        tovisit.splice(temp,1);
-        time+=D[prop[i][j-1]][prop[i][j]];
+                while((time+D[prop[i][j-1]][tovisit[temp]]+D[tovisit[temp]][0]>dayend*3600 ||  !isopen)  && iters<MAX_ITER)
+            if(iters>=MAX_ITER) break;
+            prop[i].push(tovisit[temp]);
+            tovisit.splice(temp,1);
+            time+=D[prop[i][j-1]][prop[i][j]];
+            console.log("Day:"+i+" Planning thus far: "+prop[i]);
+            if(tovisit.length==0) break;
+        }
+        console.log("tovisit="+tovisit);
         if(tovisit.length==0) break;
-    }
-    if(tovisit.length==0) break;
-    }
+        }
     for(var i=0;i<days;i++){
         prop[i].push(0);
     }
+    console.log(prop);
     return {prop:prop, unvisited:tovisit};
     }
 function costcmb(combix,D,visits){
@@ -171,7 +165,9 @@ function costcmb(combix,D,visits){
 function roulette(n,delta,D,visits,openings,days,firstday,daystart,dayend,maxiters){
     var bestcomb=combi(n,delta,D,openings,days,firstday,daystart,dayend); //init
     var bestcost=costcmb(bestcomb,D,visits);
+    console.log("Days:"+days);
     for(var i=0;i<maxiters;i++){
+        console.log('Roll >>'+i);
         var altcomb=combi(n,delta,D,openings,days,firstday,daystart,dayend);
         var altcost=costcmb(altcomb,D,visits);
         if(altcost.cost<bestcost.cost){
@@ -201,4 +197,24 @@ function parseTime(timeString) {
         d.setSeconds(0, 0);
         return d;
         }
+function isOpen(day,time,openings){
+    var open=[];
+    var close=[];
+    var isopen=false;
+    for(var k=0;k<openings.length;k++){
+        if(openings[k].close.day==day){
+            close.push(openings[k].close.time);
+            open.push(openings[k].open.time);
+        }
+    }
+    if(open){
+        for(var k=0; k<close.length;k++){
+            //time in seconds
+        close[k]=parseInt(close[k].substr(0,2))*3600+parseInt(close[k].substr(2,2))*60;
+        open[k]=parseInt(open[k].substr(0,2))*3600+parseInt(open[k].substr(2,2))*60;
+        isopen=isopen || ((time<close[k]) && (time>open[k]));
+    }
+    }
+    return isopen;
 }
+};

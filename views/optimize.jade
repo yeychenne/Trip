@@ -106,7 +106,7 @@ html
                     var openining=body.appendChild(document.createElement("div"));
                     openining.appendChild(document.createElement("STRONG")).innerHTML="Opening hours: ";
                     openining.appendChild(document.createElement("BR"));
-                    openining.appendChild(document.createTextNode(sites[cm[i][j]-1].properties.periode_ouverture));
+                    openining.appendChild(document.createTextNode(sites[cm[i][j]-1].weekday_text[(data.firstday+i-1)%7]));
                     body.appendChild(document.createElement("STRONG")).innerHTML="addresse:";
                     body.appendChild(document.createElement("BR"));
                     var address=body.appendChild(document.createElement("P"));
