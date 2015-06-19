@@ -46,8 +46,9 @@ module.exports = function(app) {
             } else {
                 if (trip) {
                 console.log(trip);
-                Site.find({}).lean().exec(function (err, dbsites) {
+                Site.find({'periods.0': {$exists: true}}).lean().exec(function (err, dbsites) {
                     if(err) console.log("Cannot read sites database");
+                    console.log("Sent database of "+dbsites.length);
                     res.render('editsites', {dbsites: dbsites, trip: trip});
                 });
                 } else
@@ -78,8 +79,10 @@ module.exports = function(app) {
                     console.log(sites);
                     res.render('recap', {sites: sites, trip: trip});
                 });
-                } else
+                } else {
                 console.log("Something went wrong");
+                res.redirect('/404');
+            }
         }});
     });
 // API Export the sites database ============================

@@ -45,6 +45,14 @@ html
                 div.container.pad2(id="planning")
 
         script.
+            var weekday = new Array(7);
+            weekday[0]=  "Sunday";
+            weekday[1] = "Monday";
+            weekday[2] = "Tuesday";
+            weekday[3] = "Wednesday";
+            weekday[4] = "Thursday";
+            weekday[5] = "Friday";
+            weekday[6] = "Saturday";
             var savecombi= document.getElementById('savecombi');
             var planning= document.getElementById('planning');
             var meta= document.getElementById('meta');
@@ -62,7 +70,9 @@ html
             for(var i=0;i<data.days;i++){
                 if (cm[i].length==2) {
                 var titleDay=planning.appendChild(document.createElement('H3'));
-                titleDay.innerHTML="Day "+(i+1);
+                var daystring=new Date(Date.parse(trip.start_date));
+                daystring.setDate(daystring.getDate() + i);
+                titleDay.innerHTML="Day "+(i+1)+" ("+weekday[daystring.getDay()]+" "+daystring.toISOString().substring(0, 10)+")";
                 var summary=planning.appendChild(document.createElement('div'));
                 summary.className="bs-callout bs-callout-info";
                 summary.appendChild(document.createElement("STRONG")).innerHTML="A free day, you can visit some extra sites";
@@ -70,7 +80,9 @@ html
                     }
                 var vtime=0;
                 var titleDay=planning.appendChild(document.createElement('H3'));
-                titleDay.innerHTML="Day "+(i+1)+" - "+(cm[i].length-2)+" sites";
+                var daystring=new Date(Date.parse(trip.start_date));
+                daystring.setDate(daystring.getDate() + i);
+                titleDay.innerHTML="Day "+(i+1)+" ("+weekday[daystring.getDay()]+" "+daystring.toISOString().substring(0, 10)+")  - "+(cm[i].length-2)+" sites";
                 var summary=planning.appendChild(document.createElement('div'));
                 summary.className="bs-callout bs-callout-info";
                 var day=planning.appendChild(document.createElement('ul'));
@@ -83,7 +95,7 @@ html
                 icon.className="glyphicon glyphicon-home";
                 var timing=list.appendChild(document.createElement('div'));
                 var icon=timing.appendChild(document.createElement('i')).className="fa fa-clock-o";
-                timing.appendChild(document.createTextNode(" "+Math.round(times[i][0]/3600)+":"+("0"+Math.round(times[i][0]/60)%60).slice(-2)));
+                timing.appendChild(document.createTextNode(" "+Math.floor(times[i][0]/3600)+":"+("0"+Math.floor(times[i][0]/60)%60).slice(-2)));
 
                 for(var j=1;j<cm[i].length-1;j++){
                     var list=day.appendChild(document.createElement('li'));
@@ -93,8 +105,8 @@ html
                     route.className="fancyroute";
                     var icon=route.appendChild(document.createElement('i')).className="fa fa-car";
                     route.appendChild(document.createElement("BR"));
-                    route.appendChild(document.createTextNode(Math.round((data.matrix[j-1][cm[i][j]]-data.visits[j-1])/60)+" min"));
-                    vtime+=Math.round(sites[cm[i][j]-1].visit);
+                    route.appendChild(document.createTextNode(Math.floor((data.matrix[j-1][cm[i][j]]-data.visits[j-1])/60)+" min"));
+                    vtime+=Math.floor(sites[cm[i][j]-1].visit);
                     var list=day.appendChild(document.createElement('li'));
                     list.style.marginBottom ="90px";
                     list.style.marginTop ="90px";
@@ -109,7 +121,7 @@ html
                     heading.className="timeline-heading";
                     var timing=heading.appendChild(document.createElement('div'));
                     var icon=timing.appendChild(document.createElement('i')).className="fa fa-clock-o";
-                    timing.appendChild(document.createTextNode(" "+Math.floor(times[i][j]/3600)+":"+("0"+Math.round(times[i][j]/60)%60).slice(-2)));
+                    timing.appendChild(document.createTextNode(" "+Math.floor(times[i][j]/3600)+":"+("0"+Math.floor(times[i][j]/60)%60).slice(-2)));
                     var title=heading.appendChild(document.createElement('H4'));
                     title.className="timeline-title";
                     title.innerHTML=sites[cm[i][j]-1].properties.title;
@@ -117,7 +129,7 @@ html
                     body.className="timeline-body";
                     var duration=body.appendChild(document.createElement("div"));
                     duration.appendChild(document.createElement("STRONG")).innerHTML="Visit duration: ";
-                    duration.appendChild(document.createTextNode(Math.round(sites[cm[i][j]-1].visit)+" minutes"));
+                    duration.appendChild(document.createTextNode(Math.floor(sites[cm[i][j]-1].visit)+" minutes"));
                     var openining=body.appendChild(document.createElement("div"));
                     openining.appendChild(document.createElement("STRONG")).innerHTML="Opening hours: ";
                     openining.appendChild(document.createElement("BR"));
@@ -142,7 +154,7 @@ html
                 route.className="fancyroute";
                 var icon=route.appendChild(document.createElement('i')).className="fa fa-car";
                 route.appendChild(document.createElement("BR"));
-                route.appendChild(document.createTextNode(Math.round((data.matrix[cm[i][j-1]][cm[i][j]]-data.visits[j-1])/60)+" min"));
+                route.appendChild(document.createTextNode(Math.floor((data.matrix[cm[i][j-1]][cm[i][j]]-data.visits[j-1])/60)+" min"));
                 var list=day.appendChild(document.createElement('li'));
                 var badge=list.appendChild(document.createElement('div'));
                 badge.className="timeline-badge";
@@ -151,7 +163,6 @@ html
                 icon.className="glyphicon glyphicon-home";
                 var timing=list.appendChild(document.createElement('div'));
                 var icon=timing.appendChild(document.createElement('i')).className="fa fa-clock-o";
-                timing.appendChild(document.createTextNode(" "+Math.floor(times[i][j]/3600)+":"+("0"+Math.round(times[i][j]/60)%60).slice(-2)));
+                timing.appendChild(document.createTextNode(" "+Math.floor(times[i][j]/3600)+":"+("0"+Math.floor(times[i][j]/60)%60).slice(-2)));
                 }
-
 

@@ -13,13 +13,14 @@ module.exports = function(app, appEnv) {
         var origins=[];
         var nodes=["s"];
         var visits=[];
-        var openings=[];
+        var openings=["null"];
         var dis;
         while(id.charAt(0) === ':')
             id = id.substr(1);
         Trip.findById(id, function(err, trip){
             if (err) {
                 console.log("Wrong trip id");
+                res.send({ error: 'Not found' });
             } else {
                 if (trip) {
                 origins.push(trip.stayaddress.coordinates[0]+','+trip.stayaddress.coordinates[1]);
@@ -50,8 +51,9 @@ module.exports = function(app, appEnv) {
                     }
                     else console.log("Cannot get Distance Matrix "+distances.status);});
                     });
-            } else
-                    console.log("Something went wrong");
+            } else{
+                console.log("Something went wrong - end of data");
+                res.redirect('/404');}
             }});
 
     });
@@ -61,6 +63,7 @@ module.exports = function(app, appEnv) {
 // Trip Optimization =============================================
     app.get('/optimize/:id', function (req, res) {
         var id = req.params.id;
+        var MAX_R=1000;
         while(id.charAt(0) === ':')
             id = id.substr(1);
         var options = {
@@ -72,8 +75,9 @@ module.exports = function(app, appEnv) {
         var req = http.get(options, function(response) {
           response.on('data', function (optData) {
                var data=JSON.parse(optData);
+               if(data.error) res.redirect('/404');
+               if(!data.error){
                var D=data.matrix;
-               console.log(D);
                var n=data.sites.length;
                var visits=data.visits;
                var openings=data.openings;
@@ -82,11 +86,12 @@ module.exports = function(app, appEnv) {
                var daystart=data.daystart;
                var dayend=data.dayend;
                var delta=28800; //8 hours per day from
-               var mybest=roulette(n,delta,D,visits,openings,days,firstday,daystart,dayend,10);
+               var mybest=roulette(n,delta,D,visits,openings,days,firstday,daystart,dayend,MAX_R);
                console.log("Sent data:")
                console.log(JSON.stringify(mybest));
                // console.log(JSON.stringify(data));
                res.render('optimize',{combi: mybest, data:data});
+           }
           });
         });
     });
@@ -102,7 +107,7 @@ function combi(n,delta,D,openings,days,firstday,daystart,dayend){
     var temp;
     var isopen;
     var iters;
-    var MAX_ITER=10;
+    var MAX_ITER=30;
 
     for (var i = 1; i <= n; i++) {
         tovisit.push(i);
@@ -115,27 +120,36 @@ function combi(n,delta,D,openings,days,firstday,daystart,dayend){
         prop[i].push(0); //0 for home node
     }
     for(var i=0;i<days;i++){ //Looping over days
+        var opens=false;
         var time=daystart*3600;
+        var count=0;
+        // console.log(">>>>> Day "+i+" Weekday:"+(firstday+i)%7);
+        // console.log("Initial start at "+time);
         var day=(daystart+i)%7;
         times[i].push(time);
         for (var j=1;j<=n;j++){
             iters=0;
             do {
-                // console.log("looking for day="+day);
                 temp=Math.floor(Math.random()*(tovisit.length-1));
                 iters++;
-                var isopen=isOpen((firstday+i)%7,time+D[prop[i][j-1]][tovisit[temp]],openings[temp]);
+                var isopen=isOpen((firstday+i)%7,time+D[prop[i][j-1]][tovisit[temp]],openings[tovisit[temp]]);
+                opens=opens || isopen;
+                count++;
+                if(.8>Math.random() && !opens) {
+                    times[i][times[i].length-1]+=900; time+=900;
+                    console.log("count="+count);
+                    // console.log("starting at "+ time);
+                    }
                 }
                 while((time+D[prop[i][j-1]][tovisit[temp]]+D[tovisit[temp]][0]>dayend*3600 ||  !isopen)  && iters<MAX_ITER)
             if(iters>=MAX_ITER) break;
+            // console.log("Pushing site "+tovisit[temp]+" open:"+isopen+" time:"+time+D[prop[i][j-1]][tovisit[temp]]+" openings="+JSON.stringify(openings[tovisit[temp]]));
             prop[i].push(tovisit[temp]);
             tovisit.splice(temp,1);
             time+=D[prop[i][j-1]][prop[i][j]];
             times[i].push(time);
-            // console.log("Day:"+i+" Planning thus far: "+prop[i]);
             if(tovisit.length==0) break;
         }
-        // console.log("tovisit="+tovisit);
         if(tovisit.length==0) break;
         }
     for(var i=0;i<days;i++){
@@ -143,15 +157,15 @@ function combi(n,delta,D,openings,days,firstday,daystart,dayend){
         if(prop[i].length>1) times[i].push(time);
         prop[i].push(0);
     }
-    // console.log(prop);
-    // console.log(times);
     return {prop:prop, unvisited:tovisit, times:times};
     }
 function costcmb(combix,D,visits){
     // To compare two routes we'll choose the ones with less commuting. we're also favorising well distributed routes.
+    var Penalty=10000000;
     var days=combix.prop.length;
     var Commut=new Array(days);
     var duration=new Array(days);
+    var unvisited=combix.unvisited;
     var sum=0;
     var sq=0;
     if (combix.prop==0) return Number.POSITIVE_INFINITY;
@@ -165,16 +179,18 @@ function costcmb(combix,D,visits){
         sq+=Commut[i]*Commut[i];
     }
 
-    return {cost:sq/days-(sum/days)*(sum/days), Commut:Commut};
+    return {cost:sq/days-(sum/days)*(sum/days)+Penalty*unvisited.length, Commut:Commut};
 }
 
 function roulette(n,delta,D,visits,openings,days,firstday,daystart,dayend,maxiters){
     var bestcomb=combi(n,delta,D,openings,days,firstday,daystart,dayend); //init
     var bestcost=costcmb(bestcomb,D,visits);
     for(var i=0;i<maxiters;i++){
-        // console.log('Roll >>'+i);
+        // console.log('Roll >>>'+i);
         var altcomb=combi(n,delta,D,openings,days,firstday,daystart,dayend);
         var altcost=costcmb(altcomb,D,visits);
+        // console.log(">>prop: "+altcomb.prop);
+        // console.log(">>Cost: "+altcost.cost);
         if(altcost.cost<bestcost.cost){
             bestcomb=altcomb;
             bestcost=costcmb(bestcomb,D,visits);
@@ -206,6 +222,7 @@ function isOpen(day,time,openings){
     var open=[];
     var close=[];
     var isopen=false;
+
     for(var k=0;k<openings.length;k++){
         if(openings[k].close.day==day){
             close.push(openings[k].close.time);
@@ -217,7 +234,11 @@ function isOpen(day,time,openings){
             //time in seconds
         close[k]=parseInt(close[k].substr(0,2))*3600+parseInt(close[k].substr(2,2))*60;
         open[k]=parseInt(open[k].substr(0,2))*3600+parseInt(open[k].substr(2,2))*60;
+        // console.log(open[k]+"->"+close[k]+" - "+ time);
+        // thisopen=((time<close[k]) && (time>open[k]));
+        // if(thisopen) console.log("time="+time+" from "+open[k]+" to "+close[k]);
         isopen=isopen || ((time<close[k]) && (time>open[k]));
+        
     }
     }
     return isopen;

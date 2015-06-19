@@ -19,6 +19,6 @@ module.exports = {
         'clientID'      : '57680889922-kd5i024qiu72l428i15he18e59h3do0a.apps.googleusercontent.com',
         'clientSecret'  : 'r7-gYVzg63t1dnkXT6rkIJve',
         'callbackURL'   : 'http://localhost:6004/auth/google/callback',
-        'APIkey'        : 'AIzaSyAyXAh_jfP_KHlzfNep7KtUocUhOLHozDM'
+        'APIkey'        : 'AIzaSyAjBCEJh0Kmvnj14GQ1G0aJ_080T8HkuVA'
     }
 };
